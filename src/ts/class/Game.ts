@@ -318,8 +318,8 @@ export class Game {
     loadTestLevel() {
         this.gameObjects = [
             new TestPlayer({ x: 100, y: 100 }),
-            new Sphere({ x: 0, y: 0, z: 0, r: 10 }),
             new Sphere({ x: 0, y: 0, z: 320 / 2, r: 10 }),
+            new Sphere({ x: 0, y: 0, z: 0, r: 10 }),
             new Sphere({ x: 0, y: 0, z: -320 / 2, r: 10 }),
             new GameObject({ x: -10, y: -10, z: 0, width: 20, height: 20, depth: 20 }),
         ];
@@ -355,7 +355,7 @@ export class Game {
         }
 
         // update everything
-        for (let o of this.allObjects) {
+        for (let o of this.allObjects.sort((a, b) => b.pos[2] - a.pos[2])) {
             o.draw(this.ctx);
             if (o.drawXZ) o.drawXZ(this.zCtx);
             if (o.drawXY) o.drawXY(this.yCtx);

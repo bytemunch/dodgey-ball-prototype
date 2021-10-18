@@ -7,12 +7,15 @@ export class Sphere extends GameObject {
     vel: vec3;
     r: number;
 
+    color: string;
+
     constructor(o: SphereOptions) {
         super({ ...o, depth: o.r, height: o.r, width: o.r })
 
         this.r = o.r;
         this.pos = vec3.fromValues(o.x, o.y, o.z);
         this.vel = vec3.fromValues(3, 3, 0);
+        this.color = `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255} )`;
     }
 
     update() {
@@ -34,7 +37,7 @@ export class Sphere extends GameObject {
     draw(ctx: CanvasRenderingContext2D) {
         game.camera.project(this);
 
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(
             this.projectedX - this.width,
@@ -47,7 +50,7 @@ export class Sphere extends GameObject {
     }
 
     drawXY(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(game.rsY(this.pos[0]), game.rsY(this.pos[1]), game.rsY(this.r), 0, Math.PI * 2);
         ctx.closePath();
@@ -55,7 +58,7 @@ export class Sphere extends GameObject {
     }
 
     drawXZ(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(game.rsZ(this.pos[0]), game.rsZ(this.pos[2]), game.rsZ(this.r), 0, Math.PI * 2);
         ctx.closePath();
