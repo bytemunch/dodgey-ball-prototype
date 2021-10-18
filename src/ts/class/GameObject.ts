@@ -9,14 +9,14 @@ export class GameObject {
 
     health: number;
 
-    camera: Camera;
+    projectedScale: number;
+    projectedX: number;
+    projectedY: number;
 
     constructor(o: GameObjectOptions) {
         this.pos = vec3.fromValues(o.x, o.y, o.z)//new Vector({ x: o.x, y: o.y });
         this.vel = vec3.fromValues(0, 0, 3);
         this.size = vec3.fromValues(o.width, o.height, o.depth)
-
-        this.camera = new Camera(game.cnv, this);
     }
 
     update() {
@@ -63,13 +63,13 @@ export class GameObject {
     }
 
     draw(ctx: CanvasRenderingContext2D) {
-        this.camera.project();
+        game.camera.project(this);
         ctx.fillStyle = '#FF00FF';
         ctx.fillRect(
-            this.camera.projectedX - this.width,
-            this.camera.projectedY - this.height,
-            this.width * 2 * this.camera.projectedScale,
-            this.height * 2 * this.camera.projectedScale
+            this.projectedX - this.width,
+            this.projectedY - this.height,
+            this.width * 2 * this.projectedScale,
+            this.height * 2 * this.projectedScale
         );
     }
 

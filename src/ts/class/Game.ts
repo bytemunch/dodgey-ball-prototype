@@ -1,4 +1,5 @@
 import { AudioManager } from "./AudioManager.js";
+import { Camera } from "./Camera.js";
 import { GameObject } from "./GameObject.js";
 import { GamepadManager } from "./GamepadManager.js";
 import { MouseTouchManager } from "./MouseTouchManager.js";
@@ -11,6 +12,9 @@ export class Game {
     // Main canvas
     cnv: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
+
+    // Main camera
+    camera: Camera;
 
     // Interface Canvas
     iCnv: HTMLCanvasElement;
@@ -73,6 +77,8 @@ export class Game {
         this.cnv = document.createElement('canvas');
         this.cnv.id = 'game-canvas';
 
+        this.camera = new Camera(this.cnv);
+
         this.ctx = this.cnv.getContext('2d');
 
         this.iCnv = document.createElement('canvas');
@@ -89,6 +95,7 @@ export class Game {
         this.yCnv.id = 'xy-canvas';
 
         this.yCtx = this.yCnv.getContext('2d');
+
 
 
         // setup initial canvas sizes
@@ -185,11 +192,7 @@ export class Game {
 
         this.yCtx.translate(-this.rsY(this.naturalGameBB.x), -this.rsY(this.naturalGameBB.y));
 
-        if (this.gameObjects) {
-            for (let go of this.gameObjects) {
-                go.camera.update();
-            }
-        }
+        this.camera.update();
     }
 
     clearData() {

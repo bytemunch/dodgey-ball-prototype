@@ -32,14 +32,14 @@ export class Sphere extends GameObject {
     }
 
     draw(ctx: CanvasRenderingContext2D) {
-        this.camera.project();
+        game.camera.project(this);
 
         ctx.fillStyle = '#FFFFFF';
         ctx.beginPath();
         ctx.arc(
-            this.camera.projectedX - this.width,
-            this.camera.projectedY - this.height,
-            this.camera.projectedScale * 2 * this.r,
+            this.projectedX - this.width,
+            this.projectedY - this.height,
+            this.projectedScale * 2 * this.r,
             0,
             Math.PI * 2);
         ctx.closePath();

@@ -1,4 +1,4 @@
-import { GameObject } from "./GameObject";
+import { GameObject } from "./GameObject.js";
 
 export class Camera {
     cnv: HTMLCanvasElement;
@@ -7,16 +7,8 @@ export class Camera {
     projectionCx: number;
     projectionCy: number;
 
-    projectedScale: number;
-    projectedX: number;
-    projectedY: number;
-
-    parent: GameObject;
-
-    constructor(cnv: HTMLCanvasElement, parent: GameObject) {
+    constructor(cnv: HTMLCanvasElement) {
         this.cnv = cnv;
-        this.parent = parent;
-
         this.update();
     }
 
@@ -26,10 +18,9 @@ export class Camera {
         this.projectionCy = this.cnv.height / 4;
     }
 
-    project() {
-        this.projectedScale = this.perspective / (this.perspective + this.parent.z);
-
-        this.projectedX = (this.parent.x * this.projectedScale) + this.projectionCx;
-        this.projectedY = (this.parent.y * this.projectedScale) + this.projectionCy;
+    project(o:GameObject) {
+        o.projectedScale = this.perspective / (this.perspective + o.z);
+        o.projectedX = (o.x * o.projectedScale) + this.projectionCx;
+        o.projectedY = (o.y * o.projectedScale) + this.projectionCy;
     }
 }
