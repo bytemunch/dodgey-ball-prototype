@@ -1,44 +1,54 @@
-import { vec2 } from "../lib/gl-matrix/index.js";
+import { vec3 } from "../lib/gl-matrix/index.js";
 import { game } from "../main.js";
+import { Camera } from "./Camera.js";
 
 export class GameObject {
-    pos: vec2;
-    vel: vec2;
-
-    width: number;
-    height: number;
+    pos: vec3;
+    vel: vec3;
+    size: ReadonlyVec3;
 
     health: number;
 
-    prevBB;
+    camera: Camera;
 
     constructor(o: GameObjectOptions) {
-        this.pos = vec2.fromValues(o.x, o.y)//new Vector({ x: o.x, y: o.y });
-        this.vel = vec2.create();
-        this.width = 48;
-        this.height = 48;
+        this.pos = vec3.fromValues(o.x, o.y, o.z)//new Vector({ x: o.x, y: o.y });
+        this.vel = vec3.fromValues(0, 0, 3);
+        this.size = vec3.fromValues(o.width, o.height, o.depth)
+
+        this.camera = new Camera(game.cnv, this);
     }
 
     update() {
-        this.prevBB = {
-            left: this.left,
-            right: this.right,
-            top: this.top,
-            bottom: this.bottom,
+        vec3.add(this.pos, this.pos, this.vel);
+
+        if (this.cz > game.naturalGameBB.depth / 2 || this.cz < game.naturalGameBB.z) {
+            this.vel[2] *= -1;
         }
     }
 
-    get left() {
+    get x() {
         return this.pos[0];
     }
-    get right() {
-        return this.pos[0] + this.width;
-    }
-    get top() {
+
+    get y() {
         return this.pos[1];
     }
-    get bottom() {
-        return this.pos[1] + this.height;
+
+    get z() {
+        return this.pos[2];
+    }
+
+    get width() {
+        return this.size[0];
+    }
+
+    get height() {
+        return this.size[1];
+    }
+
+    get depth() {
+        return this.size[2];
     }
 
     get cx() {
@@ -48,42 +58,48 @@ export class GameObject {
         return this.pos[1] + this.height / 2;
     }
 
-    collide(o: GameObject) {
-        if (o == this) return;
-
-        if (this.left < o.right &&
-            this.right > o.left &&
-            this.top < o.bottom &&
-            this.bottom > o.top) {
-
-            // Collision!
-
-            const leftCollide = this.prevBB.right < o.left && this.right >= o.left;
-
-            const rightCollide = this.prevBB.left >= o.right && this.left < o.right;
-
-            const topCollide = this.prevBB.bottom < o.top && this.bottom >= o.top;
-
-            const bottomCollide = this.prevBB.top >= o.bottom && this.top < o.bottom;
-
-            console.log(`collision! R:${rightCollide} L:${leftCollide} T:${topCollide} B:${bottomCollide}`);
-            // if (!rightCollide && !leftCollide && !topCollide && !bottomCollide) debugger;
-            return { r: rightCollide, l: leftCollide, t: topCollide, b: bottomCollide };
-
-        }
+    get cz() {
+        return this.pos[2] + this.depth / 2;
     }
 
     draw(ctx: CanvasRenderingContext2D) {
+        this.camera.project();
         ctx.fillStyle = '#FF00FF';
-        ctx.fillRect(game.rs(this.pos[0]), game.rs(this.pos[1]), game.rs(this.width / 2), game.rs(this.height / 2));
-        ctx.fillRect(game.rs(this.pos[0] + this.width / 2), game.rs(this.pos[1] + this.height / 2), game.rs(this.width / 2), game.rs(this.height / 2));
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(game.rs(this.pos[0]), game.rs(this.pos[1] + this.height / 2), game.rs(this.width / 2), game.rs(this.height / 2));
-        ctx.fillRect(game.rs(this.pos[0] + this.width / 2), game.rs(this.pos[1]), game.rs(this.width / 2), game.rs(this.height / 2));
+        ctx.fillRect(
+            this.camera.projectedX - this.width,
+            this.camera.projectedY - this.height,
+            this.width * 2 * this.camera.projectedScale,
+            this.height * 2 * this.camera.projectedScale
+        );
+    }
+
+    // DEBUG
+    drawXZ(ctx:CanvasRenderingContext2D) {
+        ctx.fillStyle = '#FF00FF';
+        ctx.fillRect(
+            game.rsZ(this.x),
+            game.rsZ(this.z),
+            game.rsZ(this.width),
+            game.rsZ(this.depth)
+        );
+    }
+
+    drawXY(ctx:CanvasRenderingContext2D) {
+        ctx.fillStyle = '#FF00FF';
+        ctx.fillRect(
+            game.rsY(this.x),
+            game.rsY(this.y),
+            game.rsY(this.width),
+            game.rsY(this.height)
+        );
     }
 }
 
 interface GameObjectOptions {
     x: number,
-    y: number
+    y: number,
+    z: number,
+    width: number,
+    height: number,
+    depth: number
 }

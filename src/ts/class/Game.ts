@@ -2,6 +2,7 @@ import { AudioManager } from "./AudioManager.js";
 import { GameObject } from "./GameObject.js";
 import { GamepadManager } from "./GamepadManager.js";
 import { MouseTouchManager } from "./MouseTouchManager.js";
+import { Sphere } from "./Sphere.js";
 import { TestPlayer } from "./TestPlayer.js";
 
 export class Game {
@@ -15,6 +16,14 @@ export class Game {
     iCnv: HTMLCanvasElement;
     iCtx: CanvasRenderingContext2D;
 
+    // Top-Down Canvas
+    zCnv: HTMLCanvasElement;
+    zCtx: CanvasRenderingContext2D;
+
+    // XY Canvas
+    yCnv: HTMLCanvasElement;
+    yCtx: CanvasRenderingContext2D;
+
     // DOM stuff
     touchTarget: HTMLDivElement;
     containerDiv: HTMLDivElement;
@@ -22,7 +31,7 @@ export class Game {
     pauseMenu: HTMLDivElement;
     splashScreen: HTMLDivElement;
 
-    naturalGameBB: { x: number, y: number, width: number, height: number };
+    naturalGameBB: { x: number, y: number, z: number, width: number, height: number, depth: number };
 
     // Timing
     timeFactor: number = 0;
@@ -32,6 +41,8 @@ export class Game {
     framecount = 0;
 
     sizeRatio = 0;
+    zSizeRatio = 0;
+    ySizeRatio = 0;
 
     loopHandle;
 
@@ -44,10 +55,12 @@ export class Game {
 
     constructor() {
         this.naturalGameBB = {
-            x: 0,
-            y: 0,
+            x: -568 / 2,
+            y: -320 / 4,
+            z: -320 / 2,
             width: 568,
-            height: 320
+            height: 320,
+            depth: 320
         }
 
         // Grab DOM
@@ -67,12 +80,25 @@ export class Game {
 
         this.iCtx = this.iCnv.getContext('2d');
 
+        this.zCnv = document.createElement('canvas');
+        this.zCnv.id = 'topdown-canvas';
+
+        this.zCtx = this.zCnv.getContext('2d');
+
+        this.yCnv = document.createElement('canvas');
+        this.yCnv.id = 'xy-canvas';
+
+        this.yCtx = this.yCnv.getContext('2d');
+
+
         // setup initial canvas sizes
         this.onResize();
 
         // Append canvases to document in #main-game
         this.containerDiv.appendChild(this.cnv);
         this.containerDiv.appendChild(this.iCnv);
+        this.containerDiv.appendChild(this.zCnv);
+        this.containerDiv.appendChild(this.yCnv);
 
         // resize canvas on window resize
         window.addEventListener('resize', e => {
@@ -106,6 +132,20 @@ export class Game {
         return n / this.sizeRatio;
     }
 
+    rsZ(n) {
+        return n * this.zSizeRatio;
+    }
+    rsZ2(n) {
+        return n / this.zSizeRatio;
+    }
+
+    rsY(n) {
+        return n * this.ySizeRatio;
+    }
+    rsY2(n) {
+        return n / this.ySizeRatio;
+    }
+
     postInit() {
         this.loadData();
 
@@ -122,9 +162,34 @@ export class Game {
         this.cnv.width = this.containerBB.width;
         this.cnv.height = this.containerBB.height;
 
+        this.yCnv.width = this.containerBB.width / 2;
+        this.yCnv.height = this.containerBB.height / 2;
+
+        this.zCnv.width = this.containerBB.width / 2;
+        this.zCnv.height = this.containerBB.height / 2;
+
         // Get ratio to resize objects by
         this.sizeRatio = this.containerBB.width / this.naturalGameBB.width;
+        this.zSizeRatio = (this.containerBB.width / this.naturalGameBB.width) / 2;
+        this.ySizeRatio = (this.containerBB.width / this.naturalGameBB.width) / 2;
 
+        // this.zCtx.translate(this.containerBB.width / 4, this.containerBB.height / 4);
+        this.zCtx.translate(
+            -this.rsZ(this.naturalGameBB.x),
+            -this.rsZ(this.naturalGameBB.z),
+        );
+        this.zCtx.transform(1, 0, 0, -1, 0, 0);
+
+
+
+
+        this.yCtx.translate(-this.rsY(this.naturalGameBB.x), -this.rsY(this.naturalGameBB.y));
+
+        if (this.gameObjects) {
+            for (let go of this.gameObjects) {
+                go.camera.update();
+            }
+        }
     }
 
     clearData() {
@@ -249,7 +314,11 @@ export class Game {
 
     loadTestLevel() {
         this.gameObjects = [
-            new TestPlayer({ x: 100, y: 100 })
+            new TestPlayer({ x: 100, y: 100 }),
+            new Sphere({ x: 0, y: 0, z: 0, r: 10 }),
+            new Sphere({ x: 0, y: 0, z: 320 / 2, r: 10 }),
+            new Sphere({ x: 0, y: 0, z: -320 / 2, r: 10 }),
+            new GameObject({ x: -10, y: -10, z: 0, width: 20, height: 20, depth: 20 }),
         ];
     }
 
@@ -261,7 +330,12 @@ export class Game {
         this.prevFrameTime = t;
 
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        this.iCtx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        this.iCtx.clearRect(0, 0, this.iCtx.canvas.width, this.iCtx.canvas.height);
+
+        this.yCtx.clearRect(this.rsY(this.naturalGameBB.x), this.rsY(this.naturalGameBB.y), this.yCtx.canvas.width, this.yCtx.canvas.height);
+
+        // Clear negative Y vals as we are mirrored
+        this.zCtx.clearRect(this.rsZ(this.naturalGameBB.x), -this.rsZ(this.naturalGameBB.z), this.zCtx.canvas.width, -this.zCtx.canvas.height);
 
         // Gamepad Input
         this.gamepadMgr.refreshStates();
@@ -280,6 +354,8 @@ export class Game {
         // update everything
         for (let o of this.allObjects) {
             o.draw(this.ctx);
+            if (o.drawXZ) o.drawXZ(this.zCtx);
+            if (o.drawXY) o.drawXY(this.yCtx);
         }
 
         requestAnimationFrame(this.loop.bind(this));
