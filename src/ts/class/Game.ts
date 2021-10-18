@@ -60,7 +60,7 @@ export class Game {
     constructor() {
         this.playfield = {
             x: -568 / 2,
-            y: -320 / 4,
+            y: -320 / 5,
             z: -320 / 2,
             width: 568,
             height: 320,
