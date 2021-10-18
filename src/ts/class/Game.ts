@@ -2,7 +2,6 @@ import { AudioManager } from "./AudioManager.js";
 import { GameObject } from "./GameObject.js";
 import { GamepadManager } from "./GamepadManager.js";
 import { MouseTouchManager } from "./MouseTouchManager.js";
-import { TestGameObject } from "./TestGameObject.js";
 import { TestPlayer } from "./TestPlayer.js";
 
 export class Game {

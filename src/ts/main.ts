@@ -2,13 +2,8 @@ import { Game } from "./class/Game.js";
 
 export let game: Game;
 
-import './lib/gl-matrix.js';
-import * as glm from './lib/gl-matrix.js';
+import { vec3 } from './lib/gl-matrix/index.js'
 
-declare const glMatrix:typeof glm;
-
-export const vec3 = glMatrix.vec3;
-export const vec2 = glMatrix.vec2;
 
 window.addEventListener('DOMContentLoaded', () => {
     console.log('DOM Loaded!');

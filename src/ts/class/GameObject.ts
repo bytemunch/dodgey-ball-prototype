@@ -1,9 +1,9 @@
+import { vec2 } from "../lib/gl-matrix/index.js";
 import { game } from "../main.js";
-import { Vector } from "./Vector.js";
 
 export class GameObject {
-    pos: Vector;
-    vel: Vector;
+    pos: vec2;
+    vel: vec2;
 
     width: number;
     height: number;
@@ -13,8 +13,8 @@ export class GameObject {
     prevBB;
 
     constructor(o: GameObjectOptions) {
-        this.pos = new Vector({ x: o.x, y: o.y });
-        this.vel = new Vector({ x: 0, y: 0 });
+        this.pos = vec2.fromValues(o.x, o.y)//new Vector({ x: o.x, y: o.y });
+        this.vel = vec2.create();
         this.width = 48;
         this.height = 48;
     }
@@ -29,23 +29,23 @@ export class GameObject {
     }
 
     get left() {
-        return this.pos.x;
+        return this.pos[0];
     }
     get right() {
-        return this.pos.x + this.width;
+        return this.pos[0] + this.width;
     }
     get top() {
-        return this.pos.y;
+        return this.pos[1];
     }
     get bottom() {
-        return this.pos.y + this.height;
+        return this.pos[1] + this.height;
     }
 
     get cx() {
-        return this.pos.x + this.width / 2;
+        return this.pos[0] + this.width / 2;
     }
     get cy() {
-        return this.pos.y + this.height / 2;
+        return this.pos[1] + this.height / 2;
     }
 
     collide(o: GameObject) {
@@ -75,11 +75,11 @@ export class GameObject {
 
     draw(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = '#FF00FF';
-        ctx.fillRect(game.rs(this.pos.x), game.rs(this.pos.y), game.rs(this.width / 2), game.rs(this.height / 2));
-        ctx.fillRect(game.rs(this.pos.x + this.width / 2), game.rs(this.pos.y + this.height / 2), game.rs(this.width / 2), game.rs(this.height / 2));
+        ctx.fillRect(game.rs(this.pos[0]), game.rs(this.pos[1]), game.rs(this.width / 2), game.rs(this.height / 2));
+        ctx.fillRect(game.rs(this.pos[0] + this.width / 2), game.rs(this.pos[1] + this.height / 2), game.rs(this.width / 2), game.rs(this.height / 2));
         ctx.fillStyle = "#000000";
-        ctx.fillRect(game.rs(this.pos.x), game.rs(this.pos.y + this.height / 2), game.rs(this.width / 2), game.rs(this.height / 2));
-        ctx.fillRect(game.rs(this.pos.x + this.width / 2), game.rs(this.pos.y), game.rs(this.width / 2), game.rs(this.height / 2));
+        ctx.fillRect(game.rs(this.pos[0]), game.rs(this.pos[1] + this.height / 2), game.rs(this.width / 2), game.rs(this.height / 2));
+        ctx.fillRect(game.rs(this.pos[0] + this.width / 2), game.rs(this.pos[1]), game.rs(this.width / 2), game.rs(this.height / 2));
     }
 }
 
