@@ -18,15 +18,15 @@ export class Sphere extends GameObject {
     update() {
         vec3.add(this.pos, this.pos, this.vel);
 
-        if (this.cx > game.naturalGameBB.x + game.naturalGameBB.width || this.cx < game.naturalGameBB.x) {
+        if (this.cx > game.playfield.x + game.playfield.width || this.cx < game.playfield.x) {
             this.vel[0] *= -1;
         }
 
-        if (this.cy > game.naturalGameBB.y + game.naturalGameBB.height || this.cy < game.naturalGameBB.y) {
+        if (this.cy > game.playfield.y + game.playfield.height || this.cy < game.playfield.y) {
             this.vel[1] *= -1;
         }
 
-        if (this.cz > game.naturalGameBB.z + game.naturalGameBB.depth || this.cz < game.naturalGameBB.z) {
+        if (this.cz > game.playfield.z + game.playfield.depth || this.cz < game.playfield.z) {
             this.vel[2] *= -1;
         }
     }

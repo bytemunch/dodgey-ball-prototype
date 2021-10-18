@@ -35,7 +35,7 @@ export class Game {
     pauseMenu: HTMLDivElement;
     splashScreen: HTMLDivElement;
 
-    naturalGameBB: { x: number, y: number, z: number, width: number, height: number, depth: number };
+    playfield: { x: number, y: number, z: number, width: number, height: number, depth: number };
 
     // Timing
     timeFactor: number = 0;
@@ -58,7 +58,7 @@ export class Game {
     gameObjects: GameObject[];
 
     constructor() {
-        this.naturalGameBB = {
+        this.playfield = {
             x: -568 / 2,
             y: -320 / 4,
             z: -320 / 2,
@@ -176,21 +176,21 @@ export class Game {
         this.zCnv.height = this.containerBB.height / 2;
 
         // Get ratio to resize objects by
-        this.sizeRatio = this.containerBB.width / this.naturalGameBB.width;
-        this.zSizeRatio = (this.containerBB.width / this.naturalGameBB.width) / 2;
-        this.ySizeRatio = (this.containerBB.width / this.naturalGameBB.width) / 2;
+        this.sizeRatio = this.containerBB.width / this.playfield.width;
+        this.zSizeRatio = (this.containerBB.width / this.playfield.width) / 2;
+        this.ySizeRatio = (this.containerBB.width / this.playfield.width) / 2;
 
         // this.zCtx.translate(this.containerBB.width / 4, this.containerBB.height / 4);
         this.zCtx.translate(
-            -this.rsZ(this.naturalGameBB.x),
-            -this.rsZ(this.naturalGameBB.z),
+            -this.rsZ(this.playfield.x),
+            -this.rsZ(this.playfield.z),
         );
         this.zCtx.transform(1, 0, 0, -1, 0, 0);
 
 
 
 
-        this.yCtx.translate(-this.rsY(this.naturalGameBB.x), -this.rsY(this.naturalGameBB.y));
+        this.yCtx.translate(-this.rsY(this.playfield.x), -this.rsY(this.playfield.y));
 
         this.camera.update();
     }
@@ -335,10 +335,10 @@ export class Game {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.iCtx.clearRect(0, 0, this.iCtx.canvas.width, this.iCtx.canvas.height);
 
-        this.yCtx.clearRect(this.rsY(this.naturalGameBB.x), this.rsY(this.naturalGameBB.y), this.yCtx.canvas.width, this.yCtx.canvas.height);
+        this.yCtx.clearRect(this.rsY(this.playfield.x), this.rsY(this.playfield.y), this.yCtx.canvas.width, this.yCtx.canvas.height);
 
         // Clear negative Y vals as we are mirrored
-        this.zCtx.clearRect(this.rsZ(this.naturalGameBB.x), -this.rsZ(this.naturalGameBB.z), this.zCtx.canvas.width, -this.zCtx.canvas.height);
+        this.zCtx.clearRect(this.rsZ(this.playfield.x), -this.rsZ(this.playfield.z), this.zCtx.canvas.width, -this.zCtx.canvas.height);
 
         // Gamepad Input
         this.gamepadMgr.refreshStates();

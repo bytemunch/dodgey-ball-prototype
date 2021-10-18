@@ -22,7 +22,7 @@ export class GameObject {
     update() {
         vec3.add(this.pos, this.pos, this.vel);
 
-        if (this.cz > game.naturalGameBB.depth / 2 || this.cz < game.naturalGameBB.z) {
+        if (this.cz > game.playfield.depth / 2 || this.cz < game.playfield.z) {
             this.vel[2] *= -1;
         }
     }
