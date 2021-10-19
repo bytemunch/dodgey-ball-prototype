@@ -63,7 +63,7 @@ export class Sphere extends GameObject {
         ctx.arc(
             this.projectedX,
             this.projectedY,
-            this.projectedScale * 2 * this.r,
+            this.projectedScale * this.r,
             0,
             Math.PI * 2);
         ctx.closePath();

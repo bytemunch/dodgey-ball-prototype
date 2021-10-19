@@ -17,6 +17,8 @@ export class GameObject {
 
     color: string;
 
+    affectedByPhysics: boolean;
+
     constructor(o: GameObjectOptions) {
         this.pos = vec3.fromValues(o.x, o.y, o.z)//new Vector({ x: o.x, y: o.y });
         this.vel = vec3.create();
@@ -26,6 +28,8 @@ export class GameObject {
         this.maxSpeed = Infinity;
 
         this.color = '#FF00FF';
+
+        this.affectedByPhysics = true;
     }
 
     applyForce(f: vec3) {
@@ -33,26 +37,28 @@ export class GameObject {
     }
 
     update() {
-        this.applyForce(game.gravity);
+        if (this.affectedByPhysics) {
+            this.applyForce(game.gravity);
 
-        const sAcc = vec3.clone(this.acc);
+            const sAcc = vec3.clone(this.acc);
 
-        vec3.scale(sAcc, this.acc, game.timestep);
-        vec3.add(this.vel, this.vel, sAcc);
+            vec3.scale(sAcc, this.acc, game.timestep);
+            vec3.add(this.vel, this.vel, sAcc);
 
-        if (vec3.distance([0, 0, 0], this.vel) > this.maxSpeed) {
-            vec3.normalize(this.vel, this.vel);
-            vec3.scale(this.vel, this.vel, this.maxSpeed);
+            if (vec3.distance([0, 0, 0], this.vel) > this.maxSpeed) {
+                vec3.normalize(this.vel, this.vel);
+                vec3.scale(this.vel, this.vel, this.maxSpeed);
+            }
+
+            const sVel = vec3.clone(this.vel);
+
+            vec3.scale(sVel, this.vel, game.timestep);
+
+            vec3.add(this.pos, this.pos, sVel);
+            vec3.zero(this.acc);
+
+            this.setInPlayfieldBounds();
         }
-
-        const sVel = vec3.clone(this.vel);
-
-        vec3.scale(sVel, this.vel, game.timestep);
-
-        vec3.add(this.pos, this.pos, sVel);
-        vec3.zero(this.acc);
-
-        this.setInPlayfieldBounds();
     }
 
     setInPlayfieldBounds() {
@@ -143,10 +149,10 @@ export class GameObject {
         game.camera.project(this);
         ctx.fillStyle = this.color;
         ctx.fillRect(
-            this.projectedX - this.width,
-            this.projectedY - this.height,
-            this.width * 2 * this.projectedScale,
-            this.height * 2 * this.projectedScale
+            this.projectedX,
+            this.projectedY,
+            this.width * this.projectedScale,
+            this.height * this.projectedScale
         );
     }
 

@@ -3,6 +3,7 @@ import { AudioManager } from "./AudioManager.js";
 import { Camera } from "./Camera.js";
 import { GameObject } from "./GameObject.js";
 import { GamepadManager } from "./GamepadManager.js";
+import { Line } from "./Line.js";
 import { MouseTouchManager } from "./MouseTouchManager.js";
 import { Player } from "./Player.js";
 import { Sphere } from "./Sphere.js";
@@ -58,10 +59,10 @@ export class Game {
     // Game stuff
     gameObjects: GameObject[];
 
-    gravity: vec3 = vec3.fromValues(0,0.8,0);
+    gravity: vec3 = vec3.fromValues(0, 0.8, 0);
 
     //   multiplied with vel
-    airResistance: vec3 = vec3.fromValues(0.9,1,0.9);
+    airResistance: vec3 = vec3.fromValues(0.9, 1, 0.9);
 
     constructor() {
         this.playfield = {
@@ -324,12 +325,81 @@ export class Game {
 
     loadTestLevel() {
         this.gameObjects = [
-            new Player({ x: 100, y: this.playfield.floor - 60, z:0 }),
+            new Player({ x: 100, y: this.playfield.floor - 60, z: 0 }),
             new Sphere({ x: 0, y: 0, z: 320 / 2, r: 10 }),
             new Sphere({ x: 0, y: 0, z: 0, r: 10 }),
             new Sphere({ x: 0, y: 0, z: -320 / 2, r: 10 }),
-            new GameObject({ x: -10, y: -10, z: 0, width: 20, height: 20, depth: 20 }),
+            new GameObject({ x: -10, y: -10, z: this.playfield.z, width: 20, height: 20, depth: 20 }),
         ];
+
+        // add playfield boundary lines
+        this.gameObjects.push(...[
+            new Line(
+                [
+                    this.playfield.x,
+                    this.playfield.y + this.playfield.height,
+                    this.playfield.z + this.playfield.depth],
+                [
+                    this.playfield.x + this.playfield.width,
+                    this.playfield.y + this.playfield.height,
+                    this.playfield.z + this.playfield.depth
+                ]),
+            new Line(
+                [
+                    this.playfield.x,
+                    this.playfield.y + this.playfield.height,
+                    this.playfield.z + this.playfield.depth],
+                [
+                    this.playfield.x,
+                    this.playfield.y,
+                    this.playfield.z + this.playfield.depth
+                ]),
+            new Line(
+                [
+                    this.playfield.x + this.playfield.width,
+                    this.playfield.y + this.playfield.height,
+                    this.playfield.z + this.playfield.depth],
+                [
+                    this.playfield.x + this.playfield.width,
+                    this.playfield.y,
+                    this.playfield.z + this.playfield.depth
+                ]),
+            new Line(
+                [
+                    this.playfield.x + this.playfield.width,
+                    this.playfield.y + this.playfield.height,
+                    this.playfield.z + this.playfield.depth],
+                [
+                    this.playfield.x + this.playfield.width,
+                    this.playfield.y + this.playfield.height,
+                    this.playfield.z
+                ]),
+            new Line(
+                [
+                    this.playfield.x + this.playfield.width,
+                    this.playfield.y + this.playfield.height,
+                    this.playfield.z],
+                [
+                    this.playfield.x,
+                    this.playfield.y + this.playfield.height,
+                    this.playfield.z
+                ]
+            ),
+            new Line(
+                [
+                    this.playfield.x,
+                    this.playfield.y + this.playfield.height,
+                    this.playfield.z
+                ],
+                [
+                    this.playfield.x,
+                    this.playfield.y + this.playfield.height,
+                    this.playfield.z + this.playfield.depth
+                ],
+            ),
+
+            new Line([0, 0, 0], [10, 10, 10])
+        ])
     }
 
     async loop(t: DOMHighResTimeStamp) {

@@ -106,10 +106,10 @@ export class Player extends GameObject {
         const drawSelf = () => {
             ctx.fillStyle = this.color;
             ctx.fillRect(
-                this.projectedX - this.width,
-                this.projectedY - this.height,
-                this.width * 2 * this.projectedScale,
-                this.height * 2 * this.projectedScale
+                this.projectedX,
+                this.projectedY,
+                this.width * this.projectedScale,
+                this.height * this.projectedScale
             );
         }
 
