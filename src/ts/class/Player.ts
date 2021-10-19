@@ -40,13 +40,6 @@ export class Player extends GameObject {
             // movement
             this.applyForce(vec3.fromValues(this.controller.axes[0], 0, -this.controller.axes[1]));
 
-            // friction
-            const friction = vec3.clone(this.vel);
-            vec3.normalize(friction, friction);
-            vec3.scale(friction, friction, -1);
-            vec3.scale(friction, friction, 1.1);
-            this.applyForce(friction);
-
             // targeting
             this.target = vec3.fromValues(
                 this.controller.axes[2] > 0.1 ? this.controller.axes[2] : this.controller.axes[2] < -0.1 ? this.controller.axes[2] : 0,

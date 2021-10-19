@@ -21,10 +21,6 @@ export class Sphere extends GameObject {
         this.color = `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255} )`;
     }
 
-    get grounded() {
-        return this.y >= game.playfield.floor;
-    }
-
     get atRest() {
         const restThreshold = 1.1;
         return (
@@ -80,15 +76,6 @@ export class Sphere extends GameObject {
         }
 
         this.checkPlayfieldCollision();
-
-        if (this.grounded) {
-            // add friction
-            const friction = vec3.clone(this.vel);
-            vec3.normalize(friction, friction);
-            vec3.scale(friction, friction, -1);
-            vec3.scale(friction, friction, 0.5);
-            this.applyForce(friction);
-        }
 
         super.update();
     }

@@ -34,6 +34,10 @@ export class GameObject {
         this.affectedByPhysics = true;
     }
 
+    get grounded() {
+        return this.y >= game.playfield.floor;
+    }
+
     applyForce(f: vec3) {
         vec3.add(this.acc, this.acc, f);
     }
@@ -41,6 +45,15 @@ export class GameObject {
     update() {
         if (this.affectedByPhysics) {
             this.applyForce(game.gravity);
+
+            if (this.grounded) {
+                // add friction
+                const friction = vec3.clone(this.vel);
+                vec3.normalize(friction, friction);
+                vec3.scale(friction, friction, -1);
+                vec3.scale(friction, friction, 0.5);
+                this.applyForce(friction);
+            }
 
             const sAcc = vec3.clone(this.acc);
 
