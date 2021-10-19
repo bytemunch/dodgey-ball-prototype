@@ -3,9 +3,16 @@ import { game } from "../main.js";
 import { GameObject } from "./GameObject.js";
 
 export class Sphere extends GameObject {
+    is = 'sphere';
+
+    m: number = 1; // mass, for physikz
     r: number;
 
     color: string;
+
+    collidedThisFrame: boolean;
+
+    colliders;
 
     constructor(o: SphereOptions) {
         super({ ...o, depth: o.r * 2, height: o.r * 2, width: o.r * 2 })
@@ -27,7 +34,51 @@ export class Sphere extends GameObject {
         )
     }
 
+    get nextPos() {
+        return vec3.add([], this.pos, this.vel);
+    }
+
+    collideSphere(s: Sphere) {
+        if (s == this) return;
+
+        let collision = vec3.subtract([], this.pos, s.pos);
+
+        let dist = vec3.length(collision);
+
+        if (dist == 0) {
+            collision = vec3.fromValues(1, 0, 0);
+            dist = 1;
+        }
+
+        if (dist > this.r * 2) return;
+
+        vec3.add(this.pos, this.pos, vec3.scale([], collision, 0.25));
+
+        vec3.normalize(collision, collision);
+
+        let aci = vec3.dot(collision, this.vel);
+        let bci = vec3.dot(collision, s.vel);
+
+        let acf = bci;
+        let bcf = aci;
+
+        vec3.add(this.vel, this.vel, (vec3.scale([], collision, (acf - aci))));
+        vec3.add(s.vel, s.vel, (vec3.scale([], collision, (bcf - bci))));
+    }
+
     update() {
+
+        this.collidedThisFrame = false;
+
+        this.colliders = {
+            left: vec3.add([], this.vel, vec3.add([], this.pos, [-this.r, 0, 0])),//left
+            right: vec3.add([], this.vel, vec3.add([], this.pos, [this.r, 0, 0])),//right
+            top: vec3.add([], this.vel, vec3.add([], this.pos, [0, -this.r, 0])),//top
+            bottom: vec3.add([], this.vel, vec3.add([], this.pos, [0, this.r, 0])),//bottom
+            back: vec3.add([], this.vel, vec3.add([], this.pos, [0, 0, -this.r])),//back
+            front: vec3.add([], this.vel, vec3.add([], this.pos, [0, 0, this.r])),//front
+        }
+
         this.checkPlayfieldCollision();
 
         if (this.grounded) {
@@ -36,7 +87,7 @@ export class Sphere extends GameObject {
             vec3.normalize(friction, friction);
             vec3.scale(friction, friction, -1);
             vec3.scale(friction, friction, 0.5);
-            this.applyForce(friction);           
+            this.applyForce(friction);
         }
 
         super.update();
@@ -64,24 +115,15 @@ export class Sphere extends GameObject {
             },
         }
 
-        const colliders = {
-            left: vec3.add([], this.vel, vec3.add([], this.pos, [-this.r, 0, 0])),//left
-            right: vec3.add([], this.vel, vec3.add([], this.pos, [this.r, 0, 0])),//right
-            top: vec3.add([], this.vel, vec3.add([], this.pos, [0, -this.r, 0])),//top
-            bottom: vec3.add([], this.vel, vec3.add([], this.pos, [0, this.r, 0])),//bottom
-            back: vec3.add([], this.vel, vec3.add([], this.pos, [0, 0, -this.r])),//back
-            front: vec3.add([], this.vel, vec3.add([], this.pos, [0, 0, this.r])),//front
-        }
-
-        if (playfieldPlanes.left(colliders.left) || playfieldPlanes.right(colliders.right)) {
+        if (playfieldPlanes.left(this.colliders.left) || playfieldPlanes.right(this.colliders.right)) {
             this.bounce(0);
         }
 
-        if (playfieldPlanes.top(colliders.top) || playfieldPlanes.bottom(colliders.bottom)) {
+        if (playfieldPlanes.top(this.colliders.top) || playfieldPlanes.bottom(this.colliders.bottom)) {
             this.bounce(1);
         }
 
-        if (playfieldPlanes.back(colliders.back) || playfieldPlanes.front(colliders.front)) {
+        if (playfieldPlanes.back(this.colliders.back) || playfieldPlanes.front(this.colliders.front)) {
             this.bounce(2);
         }
     }
@@ -123,7 +165,7 @@ export class Sphere extends GameObject {
         game.camera.project(this);
 
         ctx.fillStyle = this.color;
-        
+
         if (this.atRest) ctx.fillStyle = '#00FF00';
         ctx.beginPath();
         ctx.arc(

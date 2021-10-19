@@ -424,6 +424,12 @@ export class Game {
             }
         }
 
+        for (let s of this.allObjects.filter(o => o.is == 'sphere')) {
+            for (let s2 of this.allObjects.filter(o => o.is == 'sphere')) {
+                (<Sphere>s).collideSphere((<Sphere>s2));
+            }
+        }
+
         // update everything
         for (let o of this.allObjects) {
             o.update();

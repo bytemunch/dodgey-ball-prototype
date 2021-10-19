@@ -7,6 +7,8 @@ export class GameObject {
     acc: vec3;
     size: ReadonlyVec3;
 
+    is:string = 'gameobject';
+
     maxSpeed: number;
 
     health: number;
