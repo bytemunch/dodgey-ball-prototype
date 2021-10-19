@@ -1,10 +1,11 @@
+import { vec3 } from "../lib/gl-matrix/index.js";
 import { AudioManager } from "./AudioManager.js";
 import { Camera } from "./Camera.js";
 import { GameObject } from "./GameObject.js";
 import { GamepadManager } from "./GamepadManager.js";
 import { MouseTouchManager } from "./MouseTouchManager.js";
+import { Player } from "./Player.js";
 import { Sphere } from "./Sphere.js";
-import { TestPlayer } from "./TestPlayer.js";
 
 export class Game {
     loading: boolean;
@@ -35,7 +36,7 @@ export class Game {
     pauseMenu: HTMLDivElement;
     splashScreen: HTMLDivElement;
 
-    playfield: { x: number, y: number, z: number, width: number, height: number, depth: number };
+    playfield: { x: number, y: number, z: number, width: number, height: number, depth: number, floor: number };
 
     // Timing
     timeFactor: number = 0;
@@ -57,6 +58,11 @@ export class Game {
     // Game stuff
     gameObjects: GameObject[];
 
+    gravity: vec3 = vec3.fromValues(0,0.8,0);
+
+    //   multiplied with vel
+    airResistance: vec3 = vec3.fromValues(0.9,1,0.9);
+
     constructor() {
         this.playfield = {
             x: -568 / 2,
@@ -64,7 +70,8 @@ export class Game {
             z: -320 / 2,
             width: 568,
             height: 320,
-            depth: 320
+            depth: 320,
+            floor: (-320 / 5) + 320 - 10
         }
 
         // Grab DOM
@@ -317,7 +324,7 @@ export class Game {
 
     loadTestLevel() {
         this.gameObjects = [
-            new TestPlayer({ x: 100, y: 100 }),
+            new Player({ x: 100, y: this.playfield.floor - 60, z:0 }),
             new Sphere({ x: 0, y: 0, z: 320 / 2, r: 10 }),
             new Sphere({ x: 0, y: 0, z: 0, r: 10 }),
             new Sphere({ x: 0, y: 0, z: -320 / 2, r: 10 }),

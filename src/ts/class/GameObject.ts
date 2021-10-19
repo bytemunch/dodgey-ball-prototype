@@ -1,11 +1,13 @@
 import { vec3 } from "../lib/gl-matrix/index.js";
 import { game } from "../main.js";
-import { Camera } from "./Camera.js";
 
 export class GameObject {
     pos: vec3;
-    vel: vec3;
+    readonly vel: vec3;
+    acc: vec3;
     size: ReadonlyVec3;
+
+    maxSpeed: number;
 
     health: number;
 
@@ -13,17 +15,68 @@ export class GameObject {
     projectedX: number;
     projectedY: number;
 
+    color: string;
+
     constructor(o: GameObjectOptions) {
         this.pos = vec3.fromValues(o.x, o.y, o.z)//new Vector({ x: o.x, y: o.y });
-        this.vel = vec3.fromValues(0, 0, 3);
+        this.vel = vec3.create();
+        this.acc = vec3.create();
         this.size = vec3.fromValues(o.width, o.height, o.depth)
+
+        this.maxSpeed = Infinity;
+
+        this.color = '#FF00FF';
+    }
+
+    applyForce(f: vec3) {
+        vec3.add(this.acc, this.acc, f);
     }
 
     update() {
-        vec3.add(this.pos, this.pos, this.vel);
+        this.applyForce(game.gravity);
 
-        if (this.cz > game.playfield.depth / 2 || this.cz < game.playfield.z) {
-            this.vel[2] *= -1;
+        const sAcc = vec3.clone(this.acc);
+
+        vec3.scale(sAcc, this.acc, game.timestep);
+        vec3.add(this.vel, this.vel, sAcc);
+
+        if (vec3.distance([0, 0, 0], this.vel) > this.maxSpeed) {
+            vec3.normalize(this.vel, this.vel);
+            vec3.scale(this.vel, this.vel, this.maxSpeed);
+        }
+
+        const sVel = vec3.clone(this.vel);
+
+        vec3.scale(sVel, this.vel, game.timestep);
+
+        vec3.add(this.pos, this.pos, sVel);
+        vec3.zero(this.acc);
+
+        this.setInPlayfieldBounds();
+    }
+
+    setInPlayfieldBounds() {
+        // boundCheck
+        if (this.right > game.playfield.x + game.playfield.width) {
+            this.pos[0] = game.playfield.x + game.playfield.width - this.width;
+        }
+        if (this.left < game.playfield.x) {
+            this.pos[0] = game.playfield.x;
+        }
+
+        if (this.bottom > game.playfield.y + game.playfield.height) {
+            this.pos[1] = game.playfield.y + game.playfield.height - this.height;
+        }
+
+        if (this.top < game.playfield.y) {
+            this.pos[1] = game.playfield.y;
+        }
+
+        if (this.back > game.playfield.z + game.playfield.depth) {
+            this.pos[2] = game.playfield.z + game.playfield.depth - this.depth;
+        }
+        if (this.front < game.playfield.z) {
+            this.pos[2] = game.playfield.z;
         }
     }
 
@@ -62,9 +115,33 @@ export class GameObject {
         return this.pos[2] + this.depth / 2;
     }
 
+    get top() {
+        return this.y;
+    }
+
+    get bottom() {
+        return this.y + this.height;
+    }
+
+    get left() {
+        return this.x;
+    }
+
+    get right() {
+        return this.x + this.width;
+    }
+
+    get front() {
+        return this.z;
+    }
+
+    get back() {
+        return this.z + this.depth;
+    }
+
     draw(ctx: CanvasRenderingContext2D) {
         game.camera.project(this);
-        ctx.fillStyle = '#FF00FF';
+        ctx.fillStyle = this.color;
         ctx.fillRect(
             this.projectedX - this.width,
             this.projectedY - this.height,
@@ -74,8 +151,8 @@ export class GameObject {
     }
 
     // DEBUG
-    drawXZ(ctx:CanvasRenderingContext2D) {
-        ctx.fillStyle = '#FF00FF';
+    drawXZ(ctx: CanvasRenderingContext2D) {
+        ctx.fillStyle = this.color;
         ctx.fillRect(
             game.rsZ(this.x),
             game.rsZ(this.z),
@@ -84,8 +161,8 @@ export class GameObject {
         );
     }
 
-    drawXY(ctx:CanvasRenderingContext2D) {
-        ctx.fillStyle = '#FF00FF';
+    drawXY(ctx: CanvasRenderingContext2D) {
+        ctx.fillStyle = this.color;
         ctx.fillRect(
             game.rsY(this.x),
             game.rsY(this.y),

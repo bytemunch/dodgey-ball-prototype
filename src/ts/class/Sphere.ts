@@ -3,35 +3,56 @@ import { game } from "../main.js";
 import { GameObject } from "./GameObject.js";
 
 export class Sphere extends GameObject {
-    pos: vec3;
-    vel: vec3;
     r: number;
 
     color: string;
 
     constructor(o: SphereOptions) {
-        super({ ...o, depth: o.r, height: o.r, width: o.r })
+        super({ ...o, depth: o.r*2, height: o.r*2, width: o.r*2 })
 
         this.r = o.r;
-        this.pos = vec3.fromValues(o.x, o.y, o.z);
-        this.vel = vec3.fromValues(3, 3, 0);
         this.color = `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255} )`;
     }
 
+    get grounded() {
+        return this.y >= game.playfield.floor;
+    }
+
     update() {
-        vec3.add(this.pos, this.pos, this.vel);
+        super.update();
+    }
 
-        if (this.cx > game.playfield.x + game.playfield.width || this.cx < game.playfield.x) {
-            this.vel[0] *= -1;
+    setInPlayfieldBounds() {
+        // TODO do this with vectors to make your life infinitely easier
+        // boundCheck
+        if (this.cx > game.playfield.x + game.playfield.width) {
+            this.pos[0] = game.playfield.x + game.playfield.width - this.width / 2;
+        }
+        if (this.cx < game.playfield.x + this.width) {
+            this.pos[0] = game.playfield.x + this.width - this.width / 2;
         }
 
-        if (this.cy > game.playfield.y + game.playfield.height || this.cy < game.playfield.y) {
-            this.vel[1] *= -1;
+        if (this.cy > game.playfield.y + game.playfield.height) {
+            this.pos[1] = game.playfield.y + game.playfield.height - this.height / 2;
         }
 
-        if (this.cz > game.playfield.z + game.playfield.depth || this.cz < game.playfield.z) {
-            this.vel[2] *= -1;
+        if (this.cy < game.playfield.y) {
+            this.pos[1] = game.playfield.y - this.height / 2;
         }
+
+        if (this.cz > game.playfield.z + game.playfield.depth) {
+            this.pos[2] = game.playfield.z + game.playfield.depth - this.depth / 2;
+        }
+        if (this.cz < game.playfield.z + this.width) {
+            this.pos[2] = game.playfield.z + this.width - this.depth / 2;
+        }
+    }
+
+    bounce(axis) {
+        // TODO find angle of incidence and bounce accordingly, rather than just reflecting force?
+        const restitution = 0.5;
+
+        this.vel[axis] *= -restitution;
     }
 
     draw(ctx: CanvasRenderingContext2D) {
@@ -40,8 +61,8 @@ export class Sphere extends GameObject {
         ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(
-            this.projectedX - this.width,
-            this.projectedY - this.height,
+            this.projectedX,
+            this.projectedY,
             this.projectedScale * 2 * this.r,
             0,
             Math.PI * 2);
