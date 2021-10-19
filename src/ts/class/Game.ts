@@ -424,6 +424,12 @@ export class Game {
             }
         }
 
+        // Removal
+        for (let i = this.gameObjects.length-1; i > 0; i--) {
+            if (this.gameObjects[i].toBeRemoved == true) this.gameObjects.splice(i, 1);
+        }
+
+        // Collision
         for (let s of this.allObjects.filter(o => o.is == 'sphere')) {
             for (let s2 of this.allObjects.filter(o => o.is == 'sphere')) {
                 (<Sphere>s).collideSphere((<Sphere>s2));

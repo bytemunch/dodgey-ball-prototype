@@ -10,6 +10,8 @@ export class Player extends GameObject {
 
     hasBall: boolean;
 
+    pickupRange: number;
+
     constructor(o) {
         super(o);
 
@@ -21,11 +23,11 @@ export class Player extends GameObject {
 
         this.color = '#0000FF';
 
-        this.hasBall = true;
+        this.hasBall = false;
 
         this.maxSpeed = 5;
 
-        setInterval(() => this.hasBall = true, 1000);
+        this.pickupRange = 50;
     }
 
     get controller() {
@@ -62,15 +64,32 @@ export class Player extends GameObject {
             // shoota
             if (this.controller.buttons[5].pressed) this.shoot(false);
             if (this.controller.buttons[7].pressed) this.shoot(true);
+            if (this.controller.buttons[6].pressed) this.pickupBall();
         }
 
         super.update();
     }
 
+    pickupBall() {
+        if (this.hasBall) return;
+
+        const distanceToSphere = s => {
+            return vec3.distance(this.center, s.center);
+        }
+
+        for (let s of game.gameObjects.filter(o => o.is == 'sphere')) {
+            if (!(<Sphere>s).atRest) continue;
+            if (distanceToSphere(s) >= this.pickupRange) continue;
+            this.hasBall = true;
+            s.toBeRemoved = true;
+            break;
+        }
+    }
+
     shoot(high: boolean) {
         if (!this.hasBall) return;
         // Quick and dirty spere spawning test for getting target vectors into ballz
-        const s = new Sphere({ x: this.x, y: this.y, z: this.z, r: 10 });
+        const s = new Sphere({ x: this.cx, y: this.cy, z: this.cz, r: 10 });
         const throwForce = vec3.clone(this.target);
 
         vec3.normalize(throwForce, throwForce);
@@ -95,7 +114,7 @@ export class Player extends GameObject {
         game.camera.project(this);
 
         const drawSelf = () => {
-            ctx.fillStyle = this.color;
+            ctx.fillStyle = this.hasBall ? '#FF0000' : this.color;
             ctx.fillRect(
                 this.projectedX,
                 this.projectedY,

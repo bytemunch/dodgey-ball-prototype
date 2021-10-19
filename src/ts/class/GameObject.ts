@@ -7,7 +7,7 @@ export class GameObject {
     acc: vec3;
     size: ReadonlyVec3;
 
-    is:string = 'gameobject';
+    is: string = 'gameobject';
 
     maxSpeed: number;
 
@@ -20,6 +20,8 @@ export class GameObject {
     color: string;
 
     affectedByPhysics: boolean;
+
+    toBeRemoved: boolean = false;
 
     constructor(o: GameObjectOptions) {
         this.pos = vec3.fromValues(o.x, o.y, o.z)//new Vector({ x: o.x, y: o.y });
@@ -158,6 +160,10 @@ export class GameObject {
 
     get back() {
         return this.z + this.depth;
+    }
+
+    get center() {
+        return vec3.fromValues(this.cx, this.cy, this.cz);
     }
 
     draw(ctx: CanvasRenderingContext2D) {
