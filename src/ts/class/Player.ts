@@ -19,8 +19,6 @@ export class Player extends GameObject {
 
         this.tp = new Sphere({ x: this.x, y: this.y, z: this.z, r: 5 });
 
-        this.speed = 5;
-
         this.color = '#0000FF';
 
         this.hasBall = true;
@@ -66,7 +64,7 @@ export class Player extends GameObject {
             this.tp.pos[1] += this.height;
 
 
-            this.speed = this.controller.buttons[4].pressed ? 5 : 3;
+            this.maxSpeed = this.controller.buttons[4].pressed ? 7 : 5;
 
             // shoota
             if (this.controller.buttons[5].pressed) this.shoot(false);

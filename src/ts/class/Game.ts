@@ -326,9 +326,7 @@ export class Game {
     loadTestLevel() {
         this.gameObjects = [
             new Player({ x: 100, y: this.playfield.floor - 60, z: 0 }),
-            new Sphere({ x: 0, y: 0, z: 320 / 2, r: 10 }),
             new Sphere({ x: 0, y: 0, z: 0, r: 10 }),
-            new Sphere({ x: 0, y: 0, z: -320 / 2, r: 10 }),
             new GameObject({ x: -10, y: -10, z: this.playfield.z, width: 20, height: 20, depth: 20 }),
         ];
 
