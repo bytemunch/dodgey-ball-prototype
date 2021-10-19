@@ -1,11 +1,10 @@
 import { vec3 } from "../lib/gl-matrix/index.js";
 import { game } from "../main.js";
 import { GameObject } from "./GameObject.js";
+import { Player } from "./Player.js";
 
 export class Sphere extends GameObject {
     is = 'sphere';
-
-    m: number = 1; // mass, for physikz
     r: number;
 
     color: string;
@@ -13,6 +12,10 @@ export class Sphere extends GameObject {
     collidedThisFrame: boolean;
 
     colliders;
+
+    thrownBy: number = 404; // NOTE 404 is null here
+
+    restingFrames: number = 0;
 
     constructor(o: SphereOptions) {
         super({ ...o, depth: o.r * 2, height: o.r * 2, width: o.r * 2 })
@@ -23,21 +26,25 @@ export class Sphere extends GameObject {
 
     get atRest() {
         const restThreshold = 1.1;
-        return (
-            Math.abs(this.vel[0]) < restThreshold &&
+        const restTime = 10;
+
+        if (Math.abs(this.vel[0]) < restThreshold &&
             Math.abs(this.vel[1]) < restThreshold &&
-            Math.abs(this.vel[2]) < restThreshold
-        )
+            Math.abs(this.vel[2]) < restThreshold) {
+            this.restingFrames++;
+        }
+
+        return this.restingFrames > restTime;
     }
 
     get nextPos() {
         return vec3.add([], this.pos, this.vel);
     }
 
-    collideSphere(s: Sphere) {
-        if (s == this) return;
+    collideWithObject(o: GameObject) {
+        if (o == this) return;
 
-        let collision = vec3.subtract([], this.pos, s.pos);
+        let collision = vec3.subtract([], this.pos, o.pos);
 
         let dist = vec3.length(collision);
 
@@ -48,22 +55,27 @@ export class Sphere extends GameObject {
 
         if (dist > this.r * 2) return;
 
+        this.resolveCollision(o);
+    }
+
+    resolveCollision(o: GameObject) {
+        let collision = vec3.subtract([], this.center, o.center);
+
         vec3.add(this.pos, this.pos, vec3.scale([], collision, 0.25));
 
         vec3.normalize(collision, collision);
 
         let aci = vec3.dot(collision, this.vel);
-        let bci = vec3.dot(collision, s.vel);
+        let bci = vec3.dot(collision, o.vel);
 
         let acf = bci;
         let bcf = aci;
 
         vec3.add(this.vel, this.vel, (vec3.scale([], collision, (acf - aci))));
-        vec3.add(s.vel, s.vel, (vec3.scale([], collision, (bcf - bci))));
+        vec3.add(o.vel, o.vel, (vec3.scale([], collision, (bcf - bci))));
     }
 
     update() {
-
         this.collidedThisFrame = false;
 
         this.colliders = {
@@ -77,7 +89,20 @@ export class Sphere extends GameObject {
 
         this.checkPlayfieldCollision();
 
+        this.checkPlayerCollision((<Player>game.gameObjects.filter(o => o.is == 'player')[0]));
+
+        if (this.atRest) this.thrownBy = 404;
+
         super.update();
+    }
+
+    checkPlayerCollision(p: Player) {
+        if (this.x > p.x && this.x < p.x + p.width
+            && this.y > p.y && this.y < p.y + p.height
+            && this.z > p.z && this.z < p.z + p.depth) {
+            if (this.thrownBy != 404) p.hit(this);
+            this.resolveCollision(p);
+        }
     }
 
     checkPlayfieldCollision() {
@@ -152,6 +177,15 @@ export class Sphere extends GameObject {
         game.camera.project(this);
 
         ctx.fillStyle = this.color;
+
+        switch (this.thrownBy) {
+            case 1:
+                ctx.fillStyle = '#FF0000'
+                break;
+            case 2:
+                ctx.fillStyle = '#FF00FF'
+                break;
+        }
 
         if (this.atRest) ctx.fillStyle = '#00FF00';
         ctx.beginPath();

@@ -420,7 +420,7 @@ export class Game {
 
         if (this.gamepadMgr.gamepads[0]) {
             for (let b of this.gamepadMgr.gamepads[0].buttons) {
-                if (b.value) console.log('Button %d pressed!', this.gamepadMgr.gamepads[0].buttons.indexOf(b));
+                // if (b.value) console.log('Button %d pressed!', this.gamepadMgr.gamepads[0].buttons.indexOf(b));
             }
         }
 
@@ -432,7 +432,7 @@ export class Game {
         // Collision
         for (let s of this.allObjects.filter(o => o.is == 'sphere')) {
             for (let s2 of this.allObjects.filter(o => o.is == 'sphere')) {
-                (<Sphere>s).collideSphere((<Sphere>s2));
+                (<Sphere>s).collideWithObject(s2);
             }
         }
 

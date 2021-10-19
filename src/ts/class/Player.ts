@@ -15,6 +15,8 @@ export class Player extends GameObject {
     constructor(o) {
         super(o);
 
+        this.is = 'player';
+
         this.size = vec3.fromValues(30, 60, 30);
 
         this.target = vec3.create();
@@ -32,6 +34,10 @@ export class Player extends GameObject {
 
     get controller() {
         return game.gamepadMgr.gamepads[0];
+    }
+
+    hit(s: Sphere) {
+        console.log('AHM HIT', s.thrownBy);
     }
 
     update() {
@@ -89,7 +95,7 @@ export class Player extends GameObject {
     shoot(high: boolean) {
         if (!this.hasBall) return;
         // Quick and dirty spere spawning test for getting target vectors into ballz
-        const s = new Sphere({ x: this.cx, y: this.cy, z: this.cz, r: 10 });
+        const s = new Sphere({ x: this.cx + this.target[0], y: this.cy + this.target[1], z: this.cz + this.target[2], r: 10 });
         const throwForce = vec3.clone(this.target);
 
         vec3.normalize(throwForce, throwForce);
@@ -104,6 +110,8 @@ export class Player extends GameObject {
         }
 
         s.applyForce(throwForce);
+
+        s.thrownBy = 1;
 
         game.gameObjects.push(s);
 
