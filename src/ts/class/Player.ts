@@ -1,6 +1,7 @@
 import { vec3 } from "../lib/gl-matrix/index.js";
 import { game } from "../main.js";
 import { GameObject } from "./GameObject.js";
+import { Line } from "./Line.js";
 import { Sphere } from "./Sphere.js";
 
 export class Player extends GameObject {
@@ -25,7 +26,7 @@ export class Player extends GameObject {
 
         this.target = vec3.create();
 
-        this.tp = new Sphere({ x: this.x, y: this.y, z: this.z, r: 5 });
+        this.tp = new Line(this.pos, this.target);
 
         this.color = this.team ? '#00FFFF' : '#FFFF00';
 
@@ -62,12 +63,13 @@ export class Player extends GameObject {
             this.target[2] *= -1;
 
             vec3.normalize(this.target, this.target);
+
             vec3.scale(this.target, this.target, 50);
 
-            vec3.add(this.tp.pos, this.pos, this.target);
-            // offset
-            this.tp.pos[1] += this.height;
+            const tv1 = vec3.add([], [this.center[0], this.center[1], this.z], [0, this.height / 2, 0])
 
+            this.tp.pos = tv1;
+            this.tp.pos2 = vec3.add([], tv1, this.target);
 
             this.maxSpeed = this.controller.buttons[4].pressed ? 7 : 5;
 
@@ -152,15 +154,7 @@ export class Player extends GameObject {
             this.tp.draw(ctx);
         }
 
-        if (this.z > this.tp.z) {
-            drawSelf();
-            drawTP();
-        } else {
-            drawTP();
-            drawSelf();
-        }
-
-
-
+        drawSelf();
+        drawTP();
     }
 }
