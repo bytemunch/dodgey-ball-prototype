@@ -25,6 +25,7 @@ export class UIObject {
     draw(ctx: CanvasRenderingContext2D) {
         // Project to new XYCamera
         game.cameraXY.project2D(this);
+        ctx.strokeStyle = '#FFFFFF';
         ctx.strokeRect(this.projectedX, this.projectedY, this.size[0] * this.projectedScale, this.size[1] * this.projectedScale);
     }
 }

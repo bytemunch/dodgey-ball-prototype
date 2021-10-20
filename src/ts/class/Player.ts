@@ -15,6 +15,8 @@ export class Player extends GameObject {
 
     team: number;
 
+    iframes: number = 10;
+
     constructor(o) {
         super(o);
 
@@ -42,7 +44,10 @@ export class Player extends GameObject {
     }
 
     hit(s: Sphere) {
-        console.log('AHM HIT', s.thrownBy);
+        if (this.iframes) return;
+        if (s.thrownBy == this.team) return;
+        game.addScore(this.team ? 0 : 1, 1);
+        this.iframes = 30;
     }
 
     update() {
@@ -77,6 +82,8 @@ export class Player extends GameObject {
             if (this.controller.buttons[5].pressed) this.shoot(false);
             if (this.controller.buttons[7].pressed) this.shoot(true);
             if (this.controller.buttons[6].pressed) this.pickupBall();
+
+            this.iframes > 0 ? this.iframes-- : this.iframes = 0;
         }
 
         super.update();
@@ -130,7 +137,7 @@ export class Player extends GameObject {
 
         s.applyForce(throwForce);
 
-        s.thrownBy = 1;
+        s.thrownBy = this.team;
 
         game.gameObjects.push(s);
 

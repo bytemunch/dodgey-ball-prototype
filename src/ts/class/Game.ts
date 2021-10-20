@@ -7,6 +7,7 @@ import { GamepadManager } from "./GamepadManager.js";
 import { Line } from "./Line.js";
 import { MouseTouchManager } from "./MouseTouchManager.js";
 import { Player } from "./Player.js";
+import { Scoreboard } from "./Scoreboard.js";
 import { Sphere } from "./Sphere.js";
 import { UIObject } from "./UIObject.js";
 
@@ -67,6 +68,11 @@ export class Game {
 
     gravity: vec3 = vec3.fromValues(0, 0.8, 0);
 
+    scores = {
+        0: 0,
+        1: 0
+    }
+
     //   multiplied with vel
     airResistance: vec3 = vec3.fromValues(0.9, 1, 0.9);
 
@@ -78,7 +84,7 @@ export class Game {
             width: 568,
             height: 320,
             depth: 320,
-            floor: (-320 / 5) + 320 - 10
+            floor: (-320 / 5) + 320
         }
 
         // Grab DOM
@@ -110,8 +116,6 @@ export class Game {
         this.yCnv.id = 'xy-canvas';
 
         this.yCtx = this.yCnv.getContext('2d');
-
-
 
         // setup initial canvas sizes
         this.onResize();
@@ -208,7 +212,8 @@ export class Game {
 
         this.yCtx.translate(-this.rsY(this.playfield.x), -this.rsY(this.playfield.y));
 
-        this.camera.update();
+        this.camera.update(this.sizeRatio);
+        this.cameraXY.update(this.sizeRatio);
     }
 
     clearData() {
@@ -328,7 +333,7 @@ export class Game {
     }
 
     get allObjects() {
-        return [...this.gameObjects,...this.uiObjects]
+        return [...this.gameObjects, ...this.uiObjects]
     }
 
     loadTestLevel() {
@@ -408,9 +413,12 @@ export class Game {
                 [this.playfield.x + this.playfield.width / 2, this.playfield.y + this.playfield.height, this.playfield.z + this.playfield.depth])
         ])
 
-        this.uiObjects.push(new UIObject({ pos: [0, 0] }));
-        this.uiObjects.push(new UIObject({ pos: [10, 10] }));
-        this.uiObjects.push(new UIObject({ pos: [this.cnv.width/2, this.cnv.height/2] }));
+        this.uiObjects.push(new Scoreboard({ pos: [this.playfield.x + 48, this.playfield.y - 64], team: 0 }));
+        this.uiObjects.push(new Scoreboard({ pos: [-1 * (this.playfield.x) - 48 * 2, this.playfield.y - 64], team: 1 }));
+    }
+
+    addScore(team, points) {
+        this.scores[team] += points;
     }
 
     async loop(t: DOMHighResTimeStamp) {
