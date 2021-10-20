@@ -59,6 +59,8 @@ export class Game {
     // Game stuff
     gameObjects: GameObject[];
 
+    ballSize = 20;
+
     gravity: vec3 = vec3.fromValues(0, 0.8, 0);
 
     //   multiplied with vel
@@ -327,7 +329,7 @@ export class Game {
         this.gameObjects = [
             new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: 0, team: 0 }),
             new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: 0, team: 1 }),
-            new Sphere({ x: 0, y: 0, z: 0, r: 10 }),
+            new Sphere({ x: 0, y: 0, z: 0, r: this.ballSize }),
         ];
 
         // add playfield boundary lines

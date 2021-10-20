@@ -37,7 +37,7 @@ export class GameObject {
     }
 
     get grounded() {
-        return this.y >= game.playfield.floor;
+        return this.bottom >= game.playfield.floor;
     }
 
     applyForce(f: vec3) {
