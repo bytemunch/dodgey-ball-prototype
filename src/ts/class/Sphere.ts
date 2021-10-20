@@ -90,6 +90,7 @@ export class Sphere extends GameObject {
         this.checkPlayfieldCollision();
 
         this.checkPlayerCollision((<Player>game.gameObjects.filter(o => o.is == 'player')[0]));
+        this.checkPlayerCollision((<Player>game.gameObjects.filter(o => o.is == 'player')[1]));
 
         if (this.atRest) this.thrownBy = 404;
 

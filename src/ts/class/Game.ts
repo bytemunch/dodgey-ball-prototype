@@ -325,9 +325,9 @@ export class Game {
 
     loadTestLevel() {
         this.gameObjects = [
-            new Player({ x: 100, y: this.playfield.floor - 60, z: 0 }),
+            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: 0, team: 0 }),
+            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: 0, team: 1 }),
             new Sphere({ x: 0, y: 0, z: 0, r: 10 }),
-            new GameObject({ x: -10, y: -10, z: this.playfield.z, width: 20, height: 20, depth: 20 }),
         ];
 
         // add playfield boundary lines
@@ -395,8 +395,9 @@ export class Game {
                     this.playfield.z + this.playfield.depth
                 ],
             ),
-
-            new Line([0, 0, 0], [10, 10, 10])
+            // half court line
+            new Line([this.playfield.x + this.playfield.width/2, this.playfield.y + this.playfield.height, this.playfield.z],
+                 [this.playfield.x + this.playfield.width/2, this.playfield.y + this.playfield.height, this.playfield.z + this.playfield.depth])
         ])
     }
 
@@ -425,7 +426,7 @@ export class Game {
         }
 
         // Removal
-        for (let i = this.gameObjects.length-1; i > 0; i--) {
+        for (let i = this.gameObjects.length - 1; i > 0; i--) {
             if (this.gameObjects[i].toBeRemoved == true) this.gameObjects.splice(i, 1);
         }
 
@@ -442,7 +443,7 @@ export class Game {
         }
 
         // update everything
-        for (let o of this.allObjects.sort((a, b) => b.pos[2] - a.pos[2])) {
+        for (let o of this.allObjects.sort((a, b) => b.pos[2] - a.pos[2]).sort((a,b)=> 0 - Number(a.is=='line'))) {
             o.draw(this.ctx);
             if (o.drawXZ) o.drawXZ(this.zCtx);
             if (o.drawXY) o.drawXY(this.yCtx);

@@ -12,8 +12,12 @@ export class Player extends GameObject {
 
     pickupRange: number;
 
+    team: number;
+
     constructor(o) {
         super(o);
+
+        this.team = o.team;
 
         this.is = 'player';
 
@@ -23,7 +27,7 @@ export class Player extends GameObject {
 
         this.tp = new Sphere({ x: this.x, y: this.y, z: this.z, r: 5 });
 
-        this.color = '#0000FF';
+        this.color = this.team ? '#00FFFF' : '#FFFF00';
 
         this.hasBall = false;
 
@@ -33,7 +37,7 @@ export class Player extends GameObject {
     }
 
     get controller() {
-        return game.gamepadMgr.gamepads[0];
+        return game.gamepadMgr.gamepads[this.team];
     }
 
     hit(s: Sphere) {
@@ -74,6 +78,19 @@ export class Player extends GameObject {
         }
 
         super.update();
+        this.setInPlayfieldHalf();
+    }
+
+    setInPlayfieldHalf() {
+        if (this.team) {
+            if (this.left < game.playfield.x + game.playfield.width / 2) {
+                this.pos[0] = game.playfield.x + game.playfield.width / 2;
+            }
+        } else {
+            if (this.right > game.playfield.x + game.playfield.width / 2) {
+                this.pos[0] = game.playfield.x + game.playfield.width / 2 - this.width;
+            }
+        }
     }
 
     pickupBall() {

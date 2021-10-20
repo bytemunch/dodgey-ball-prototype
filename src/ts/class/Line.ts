@@ -10,6 +10,8 @@ export class Line extends GameObject {
             width: v2[0], height: v2[1], depth: v2[2]
         });
 
+        this.is = 'line'
+
         this.pos2 = v2;
 
         this.affectedByPhysics = false;
