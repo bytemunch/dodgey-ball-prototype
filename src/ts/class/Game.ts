@@ -1,12 +1,14 @@
 import { vec3 } from "../lib/gl-matrix/index.js";
 import { AudioManager } from "./AudioManager.js";
 import { Camera } from "./Camera.js";
+import { CameraXY } from "./CameraXY.js";
 import { GameObject } from "./GameObject.js";
 import { GamepadManager } from "./GamepadManager.js";
 import { Line } from "./Line.js";
 import { MouseTouchManager } from "./MouseTouchManager.js";
 import { Player } from "./Player.js";
 import { Sphere } from "./Sphere.js";
+import { UIObject } from "./UIObject.js";
 
 export class Game {
     loading: boolean;
@@ -15,8 +17,9 @@ export class Game {
     cnv: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
 
-    // Main camera
+    // cameras
     camera: Camera;
+    cameraXY: CameraXY;
 
     // Interface Canvas
     iCnv: HTMLCanvasElement;
@@ -58,6 +61,7 @@ export class Game {
 
     // Game stuff
     gameObjects: GameObject[];
+    uiObjects: UIObject[];
 
     ballSize = 20;
 
@@ -88,6 +92,7 @@ export class Game {
         this.cnv.id = 'game-canvas';
 
         this.camera = new Camera(this.cnv);
+        this.cameraXY = new CameraXY(this.cnv);
 
         this.ctx = this.cnv.getContext('2d');
 
@@ -124,6 +129,7 @@ export class Game {
 
         // setup vars
         this.gameObjects = [];
+        this.uiObjects = [];
 
         // Add button listeners
         this.pauseMenu.querySelector('#resume').addEventListener('click', this.btnResume.bind(this));
@@ -322,7 +328,7 @@ export class Game {
     }
 
     get allObjects() {
-        return [...this.gameObjects]
+        return [...this.gameObjects,...this.uiObjects]
     }
 
     loadTestLevel() {
@@ -398,9 +404,13 @@ export class Game {
                 ],
             ),
             // half court line
-            new Line([this.playfield.x + this.playfield.width/2, this.playfield.y + this.playfield.height, this.playfield.z],
-                 [this.playfield.x + this.playfield.width/2, this.playfield.y + this.playfield.height, this.playfield.z + this.playfield.depth])
+            new Line([this.playfield.x + this.playfield.width / 2, this.playfield.y + this.playfield.height, this.playfield.z],
+                [this.playfield.x + this.playfield.width / 2, this.playfield.y + this.playfield.height, this.playfield.z + this.playfield.depth])
         ])
+
+        this.uiObjects.push(new UIObject({ pos: [0, 0] }));
+        this.uiObjects.push(new UIObject({ pos: [10, 10] }));
+        this.uiObjects.push(new UIObject({ pos: [this.cnv.width/2, this.cnv.height/2] }));
     }
 
     async loop(t: DOMHighResTimeStamp) {
@@ -433,8 +443,8 @@ export class Game {
         }
 
         // Collision
-        for (let s of this.allObjects.filter(o => o.is == 'sphere')) {
-            for (let s2 of this.allObjects.filter(o => o.is == 'sphere')) {
+        for (let s of this.gameObjects.filter(o => o.is == 'sphere')) {
+            for (let s2 of this.gameObjects.filter(o => o.is == 'sphere')) {
                 (<Sphere>s).collideWithObject(s2);
             }
         }
@@ -445,10 +455,12 @@ export class Game {
         }
 
         // update everything
-        for (let o of this.allObjects.sort((a, b) => b.pos[2] - a.pos[2]).sort((a,b)=> 0 - Number(a.is=='line'))) {
+        for (let o of this.allObjects.sort((a, b) => b.pos[2] - a.pos[2]).sort((a, b) => 0 - Number(a.is == 'line'))) {
             o.draw(this.ctx);
-            if (o.drawXZ) o.drawXZ(this.zCtx);
-            if (o.drawXY) o.drawXY(this.yCtx);
+
+            const cgo = o as GameObject;
+            if (cgo.drawXZ) cgo.drawXZ(this.zCtx);
+            if (cgo.drawXY) cgo.drawXY(this.yCtx);
         }
 
         requestAnimationFrame(this.loop.bind(this));
