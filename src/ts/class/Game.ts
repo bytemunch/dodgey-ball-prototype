@@ -294,7 +294,7 @@ export class Game {
 
     btnSetupDone() {
         this.setupGame({
-            scoreLimit: Number((<HTMLInputElement>this.setupScreen.querySelector('#score-limit')).value) || 3,
+            scoreLimit: Number((<HTMLInputElement>this.setupScreen.querySelector('#score-limit')).value) || Infinity,
             timeLimit: Number((<HTMLInputElement>this.setupScreen.querySelector('#time-limit')).value) || Infinity
         })
 
