@@ -11,7 +11,7 @@ export class UIObject {
 
     is;
 
-    z = Infinity;
+    cz = Infinity;
 
     constructor(o: UIObjectOptions) {
         this.pos = o.pos;

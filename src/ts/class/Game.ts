@@ -338,8 +338,8 @@ export class Game {
 
     loadTestLevel() {
         this.gameObjects = [
-            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: 0, team: 0 }),
-            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: 0, team: 1 }),
+            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0 }),
+            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: -30, team: 1 }),
             new Sphere({ x: 0, y: 0, z: 0, r: this.ballSize }),
             new Sphere({ x: 0, y: 0, z: 100, r: this.ballSize }),
             new Sphere({ x: 0, y: 0, z: -100, r: this.ballSize }),
@@ -465,7 +465,7 @@ export class Game {
         }
 
         // update everything
-        for (let o of this.allObjects.sort((a, b) => b.pos[2] - a.pos[2]).sort((a, b) => 0 - Number(a.is == 'line'))) {
+        for (let o of this.allObjects.sort((a, b) => b.cz - a.cz).sort((a, b) => 0 - Number(a.is == 'line'))) {
             o.draw(this.ctx);
 
             const cgo = o as GameObject;
