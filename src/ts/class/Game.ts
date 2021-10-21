@@ -10,6 +10,8 @@ import { Player } from "./Player.js";
 import { Scoreboard } from "./Scoreboard.js";
 import { Sphere } from "./Sphere.js";
 import { UIObject } from "./UIObject.js";
+import { animationInterval } from "../lib/timer/1.js";
+import { Timer } from "./Timer.js";
 
 export class Game {
     loading: boolean;
@@ -75,10 +77,10 @@ export class Game {
         1: 0
     }
 
-    scoreLimit: number;
-    timeLimit: number;
+    scoreLimit: number = 0;
+    timeLimit: number = Infinity;
 
-    gameController: AbortController;
+    matchTimerController: AbortController;
 
     //   multiplied with vel
     airResistance: vec3 = vec3.fromValues(0.9, 1, 0.9);
@@ -188,6 +190,8 @@ export class Game {
     postInit() {
         this.loadData();
 
+        this.addUi();
+
         // begin main loop
         this.loopHandle = requestAnimationFrame(this.loop.bind(this));
     }
@@ -218,9 +222,6 @@ export class Game {
             -this.rsZ(this.playfield.z),
         );
         this.zCtx.transform(1, 0, 0, -1, 0, 0);
-
-
-
 
         this.yCtx.translate(-this.rsY(this.playfield.x), -this.rsY(this.playfield.y));
 
@@ -293,7 +294,7 @@ export class Game {
 
     btnSetupDone() {
         this.setupGame({
-            scoreLimit:Number((<HTMLInputElement>this.setupScreen.querySelector('#score-limit')).value) || 3,
+            scoreLimit: Number((<HTMLInputElement>this.setupScreen.querySelector('#score-limit')).value) || 3,
             timeLimit: Number((<HTMLInputElement>this.setupScreen.querySelector('#time-limit')).value) || Infinity
         })
 
@@ -304,12 +305,16 @@ export class Game {
     setupGame(gameOptions) {
         this.scoreLimit = gameOptions.scoreLimit;
         this.timeLimit = gameOptions.timeLimit;
-        this.addUi();
         this.resetMatch();
     }
 
     resetMatch() {
-        this.gameController = new AbortController();
+        this.matchTimerController = new AbortController();
+
+        // countdown callback!
+        animationInterval(1000, this.matchTimerController.signal, time => {
+            this.timeLimit--;
+        });
 
         this.gameObjects = [
             new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0 }),
@@ -460,6 +465,7 @@ export class Game {
     addUi() {
         this.uiObjects.push(new Scoreboard({ pos: [this.playfield.x + 48, this.playfield.y - 64], team: 0 }));
         this.uiObjects.push(new Scoreboard({ pos: [-1 * (this.playfield.x) - 48 * 2, this.playfield.y - 64], team: 1 }));
+        this.uiObjects.push(new Timer({ pos: [(this.playfield.x + this.playfield.width / 2) - 48 / 2, this.playfield.y - 64] }));
     }
 
     addScore(team, points) {
@@ -470,14 +476,15 @@ export class Game {
         }
     }
 
-    gameOver(winner) {
+    gameOver(winner = null) {
+        this.matchTimerController.abort();
         // TEAM WINS
         console.log('TEAM' + winner + ' WINS!');
 
-        this.resetMatch();
         this.pause(false);
 
-        this.gameoverScreen.querySelector('h3').textContent = `${winner ? 'Cyan' : 'Yellow'} Wins!`;
+        if (!winner) this.gameoverScreen.querySelector('h3').textContent = `It's a draw!`;
+        if (winner) this.gameoverScreen.querySelector('h3').textContent = `${winner ? 'Cyan' : 'Yellow'} Wins!`;
         this.gameoverScreen.style.display = 'block';
     }
 
@@ -529,6 +536,11 @@ export class Game {
             const cgo = o as GameObject;
             if (cgo.drawXZ) cgo.drawXZ(this.zCtx);
             if (cgo.drawXY) cgo.drawXY(this.yCtx);
+        }
+
+        if (this.timeLimit <= 0) {
+            this.gameOver();
+            this.timeLimit = Infinity;
         }
 
         requestAnimationFrame(this.loop.bind(this));
