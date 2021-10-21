@@ -341,6 +341,8 @@ export class Game {
             new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: 0, team: 0 }),
             new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: 0, team: 1 }),
             new Sphere({ x: 0, y: 0, z: 0, r: this.ballSize }),
+            new Sphere({ x: 0, y: 0, z: 100, r: this.ballSize }),
+            new Sphere({ x: 0, y: 0, z: -100, r: this.ballSize }),
         ];
 
         // add playfield boundary lines
