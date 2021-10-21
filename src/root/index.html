@@ -63,60 +63,27 @@
             left: 0;
             width: 100%;
             height: 100%;
-            display: block;
-            z-index: 600;
-            backdrop-filter: blur(5px);
-            background: rgba(69, 69, 69, 0.4);
-            color: white;
-            padding: 10%;
-        }
-        
-        .fullscreen * {
-            text-align: center;
-            font-size: larger;
-            display: block;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        
-        #touch-target {
-            z-index: 500;
-            backdrop-filter: none;
-            background: none;
-        }
-        
-        .fullscreen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-            z-index: 600;
-            backdrop-filter: blur(5px);
-            background: rgba(69, 69, 69, 0.4);
-            color: white;
-            padding: 10%;
-        }
-        
-        .fullscreen * {
-            text-align: center;
-            font-size: larger;
-            display: block;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        
-        #touch-target {
-            z-index: 500;
-            backdrop-filter: none;
-            background: none;
-        }
-        
-        #pause-menu {
             display: none;
+            z-index: 600;
+            backdrop-filter: blur(5px);
+            background: rgba(69, 69, 69, 0.4);
+            color: white;
+            padding: 10%;
+        }
+        
+        .fullscreen * {
+            text-align: center;
+            font-size: larger;
+            display: block;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        #touch-target {
+            z-index: 500;
+            backdrop-filter: none;
+            background: none;
         }
         
         .fs-btn-1 {
@@ -157,20 +124,24 @@
             background-image: url('img/no-audio.png');
         }
         
-        #advert {
-            display: none;
-        }
-        
         #advert p {
             text-align: left;
             font-size: large;
+        }
+        
+        #setup-match * {
+            position: relative;
+        }
+        
+        #gameover * {
+            position: relative;
         }
     </style>
 </head>
 
 <body>
     <div id="main-game">
-        <div id="splash" class="fullscreen">
+        <div id="splash" class="fullscreen" style="display: block;">
             <img src="img/logo.png" alt="" class="logo">
             <button id="play" class="fs-btn-1">Play</button>
             <button id="clear-data" class="fs-btn-3">Clear Data</button>
@@ -189,6 +160,19 @@
             <a href="https://www.effectivecpmgate.com/x2uabykf?key=e79be3ae08606befebfff5f871c7fa5f">
                 <img src="img/ad.png" alt="">
             </a>
+        </div>
+        <div id="gameover" class="fullscreen">
+            <h2>Game Over!</h2>
+            <h3>TEAM wins!</h3>
+            <button id="gameover-ok">OK</button>
+        </div>
+        <div id="setup-match" class="fullscreen">
+            <h2>Match Setup</h2>
+            <label for="score-limit">Score Limit</label>
+            <input type="number" id="score-limit" placeholder="3">
+            <label for="time-limit">Time Limit</label>
+            <input type="number" id="time-limit" placeholder="0">
+            <button id="setup-done">Start!</button>
         </div>
         <div id="touch-target" class="fullscreen"></div>
     </div>

@@ -40,6 +40,8 @@ export class Game {
     containerBB: DOMRect;
     pauseMenu: HTMLDivElement;
     splashScreen: HTMLDivElement;
+    setupScreen: HTMLDivElement;
+    gameoverScreen: HTMLDivElement;
 
     playfield: { x: number, y: number, z: number, width: number, height: number, depth: number, floor: number };
 
@@ -73,6 +75,9 @@ export class Game {
         1: 0
     }
 
+    scoreLimit: number = 3;
+    timeLimit: number = 0;
+
     //   multiplied with vel
     airResistance: vec3 = vec3.fromValues(0.9, 1, 0.9);
 
@@ -92,6 +97,8 @@ export class Game {
         this.touchTarget = document.querySelector('#touch-target');
         this.pauseMenu = document.querySelector('#pause-menu');
         this.splashScreen = document.querySelector('#splash');
+        this.gameoverScreen = document.querySelector('#gameover');
+        this.setupScreen = document.querySelector('#setup-match');
 
         // Create canvases
         this.cnv = document.createElement('canvas');
@@ -141,6 +148,9 @@ export class Game {
         this.splashScreen.querySelector('#play').addEventListener('click', this.btnPlay.bind(this));
         this.splashScreen.querySelector('#clear-data').addEventListener('click', this.btnClearData.bind(this));
         this.containerDiv.querySelectorAll('.audio-toggle').forEach(e => e.addEventListener('click', this.btnToggleAudio.bind(this)));
+
+        this.setupScreen.querySelector('#setup-done').addEventListener('click', this.btnSetupDone.bind(this));
+        this.gameoverScreen.querySelector('#gameover-ok').addEventListener('click', this.btnGameoverOk.bind(this));
 
         this.audioMgr = new AudioManager;
 
@@ -238,7 +248,7 @@ export class Game {
         const data = JSON.parse(localStorage.getItem('save-data'));
 
         if (data) {
-            this.loadTestLevel();
+            this.setupGame();
         } else {
             this.clearData();
         }
@@ -273,14 +283,26 @@ export class Game {
     async btnPlay() {
         this.splashScreen.style.display = 'none';
         await this.audioMgr.init();
-        this.unpause();
+        this.setupScreen.style.display = 'block';
     }
 
     btnResume() {
         this.unpause();
     }
 
-    pause() {
+    btnSetupDone() {
+        this.scoreLimit = Number((<HTMLInputElement>this.setupScreen.querySelector('#score-limit')).value) || 3;
+        this.timeLimit = Number((<HTMLInputElement>this.setupScreen.querySelector('#time-limit')).value) || Infinity;
+        this.setupScreen.style.display = 'none';
+        this.unpause();
+    }
+
+    btnGameoverOk() {
+        this.gameoverScreen.style.display = 'none';
+        this.setupScreen.style.display = 'block';
+    }
+
+    pause(showMenu: boolean = true) {
         this.audioMgr.play('click');
 
         // Decrease timestep to 0
@@ -291,7 +313,7 @@ export class Game {
         decreaseTimeFactor();
 
         // TODO fadein pause menu
-        this.pauseMenu.style.display = 'block';
+        if (showMenu) this.pauseMenu.style.display = 'block';
     }
 
     unpause() {
@@ -336,15 +358,13 @@ export class Game {
         return [...this.gameObjects, ...this.uiObjects]
     }
 
-    loadTestLevel() {
-        this.gameObjects = [
-            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0 }),
-            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: -30, team: 1 }),
-            new Sphere({ x: 0, y: 0, z: 0, r: this.ballSize }),
-            new Sphere({ x: 0, y: 0, z: 100, r: this.ballSize }),
-            new Sphere({ x: 0, y: 0, z: -100, r: this.ballSize }),
-        ];
+    setupGame() {
+        this.addCourtLines();
+        this.addUi();
+        this.resetMatch();
+    }
 
+    addCourtLines() {
         // add playfield boundary lines
         this.gameObjects.push(...[
             new Line(
@@ -414,13 +434,44 @@ export class Game {
             new Line([this.playfield.x + this.playfield.width / 2, this.playfield.y + this.playfield.height, this.playfield.z],
                 [this.playfield.x + this.playfield.width / 2, this.playfield.y + this.playfield.height, this.playfield.z + this.playfield.depth])
         ])
+    }
 
+    addUi() {
         this.uiObjects.push(new Scoreboard({ pos: [this.playfield.x + 48, this.playfield.y - 64], team: 0 }));
         this.uiObjects.push(new Scoreboard({ pos: [-1 * (this.playfield.x) - 48 * 2, this.playfield.y - 64], team: 1 }));
     }
 
+    resetMatch() {
+        this.gameObjects = [
+            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0 }),
+            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: -30, team: 1 }),
+            new Sphere({ x: 0, y: 0, z: 0, r: this.ballSize }),
+            new Sphere({ x: 0, y: 0, z: 100, r: this.ballSize }),
+            new Sphere({ x: 0, y: 0, z: -100, r: this.ballSize }),
+        ];
+
+        this.addCourtLines();
+
+        this.scores = { 0: 0, 1: 0 };
+    }
+
     addScore(team, points) {
         this.scores[team] += points;
+
+        if (this.scores[team] >= this.scoreLimit) {
+            this.gameOver(team);
+        }
+    }
+
+    gameOver(winner) {
+        // TEAM WINS
+        console.log('TEAM' + winner + ' WINS!');
+
+        this.resetMatch();
+        this.pause(false);
+
+        this.gameoverScreen.querySelector('h3').textContent = `${winner ? 'Cyan' : 'Yellow'} Wins!`;
+        this.gameoverScreen.style.display = 'block';
     }
 
     async loop(t: DOMHighResTimeStamp) {
