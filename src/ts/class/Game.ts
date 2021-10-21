@@ -72,6 +72,8 @@ export class Game {
 
     gravity: vec3 = vec3.fromValues(0, 0.8, 0);
 
+    inplay: boolean;
+
     scores = {
         0: 0,
         1: 0
@@ -79,6 +81,9 @@ export class Game {
 
     scoreLimit: number = 0;
     timeLimit: number = Infinity;
+
+    ballsOneSidedSince: number;
+    ballOneSidedTimeLimit: number = 5000;
 
     matchTimerController: AbortController;
 
@@ -311,7 +316,7 @@ export class Game {
     resetMatch() {
         this.matchTimerController = new AbortController();
 
-        // countdown callback!
+        // countdown callback! second timer
         animationInterval(1000, this.matchTimerController.signal, time => {
             this.timeLimit--;
         });
@@ -327,6 +332,8 @@ export class Game {
         this.addCourtLines();
 
         this.scores = { 0: 0, 1: 0 };
+
+        this.inplay = true;
     }
 
     btnGameoverOk() {
@@ -460,6 +467,12 @@ export class Game {
             new Line([this.playfield.x + this.playfield.width / 2, this.playfield.y + this.playfield.height, this.playfield.z],
                 [this.playfield.x + this.playfield.width / 2, this.playfield.y + this.playfield.height, this.playfield.z + this.playfield.depth])
         ])
+
+        // floor lines for knowing where ya are in 3D
+        const numLines = 20;
+        for (let i = 0; i < numLines; i++) {
+            this.gameObjects.push(new Line([this.playfield.x, this.playfield.y + this.playfield.height, this.playfield.z + (this.playfield.depth / numLines) * i], [this.playfield.x + this.playfield.width, this.playfield.y + this.playfield.height, this.playfield.z + (this.playfield.depth / numLines) * i], '#FFFFFF69'))
+        }
     }
 
     addUi() {
@@ -477,6 +490,7 @@ export class Game {
     }
 
     gameOver(winner = null) {
+        this.inplay = false;
         this.matchTimerController.abort();
         // TEAM WINS
         console.log('TEAM' + winner + ' WINS!');
@@ -487,6 +501,37 @@ export class Game {
         if (winner) this.gameoverScreen.querySelector('h3').textContent = `${winner ? 'Cyan' : 'Yellow'} Wins!`;
         this.gameoverScreen.style.display = 'block';
     }
+
+    get allBallsLeft() {
+        if ((<Player>this.gameObjects.filter(v => v.is == 'player')[0]).hasBall) return false;
+
+        let left = true;
+        this.gameObjects.filter(v => v.is == 'sphere').forEach(v => { if (v.x <= this.playfield.x + this.playfield.width / 2) left = false });
+        return left;
+    }
+
+    get allBallsRight() {
+        if ((<Player>this.gameObjects.filter(v => v.is == 'player')[1]).hasBall) return false;
+
+        let right = true;
+        this.gameObjects.filter(v => v.is == 'sphere').forEach(v => { if (v.x >= this.playfield.x + this.playfield.width / 2) right = false });
+        return right;
+    }
+
+    moveAllBallsToSide() {
+        let xPos = this.allBallsLeft ? -150 : 150;
+        // TODO remove held balls
+
+        this.gameObjects.filter(v => v.is == 'sphere').forEach(v => v.toBeRemoved = true);
+        (<Player>this.gameObjects.filter(v => v.is == 'player')[this.allBallsLeft ? 1 : 0]).hasBall = false;
+
+        this.gameObjects.push(
+            new Sphere({ x: xPos, y: 0, z: 0, r: this.ballSize }),
+            new Sphere({ x: xPos, y: 0, z: 100, r: this.ballSize }),
+            new Sphere({ x: xPos, y: 0, z: -100, r: this.ballSize })
+        )
+    }
+
 
     async loop(t: DOMHighResTimeStamp) {
         // timings
@@ -538,9 +583,21 @@ export class Game {
             if (cgo.drawXY) cgo.drawXY(this.yCtx);
         }
 
-        if (this.timeLimit <= 0) {
-            this.gameOver();
-            this.timeLimit = Infinity;
+        if (this.inplay) {
+            if (this.allBallsLeft || this.allBallsRight) {
+                if (!this.ballsOneSidedSince) this.ballsOneSidedSince = t;
+                if (t > this.ballsOneSidedSince + this.ballOneSidedTimeLimit) {
+                    this.ballsOneSidedSince = 0;
+                    this.moveAllBallsToSide();
+                }
+            } else {
+                this.ballsOneSidedSince = 0;
+            }
+
+            if (this.timeLimit <= 0) {
+                this.gameOver();
+                this.timeLimit = Infinity;
+            }
         }
 
         requestAnimationFrame(this.loop.bind(this));

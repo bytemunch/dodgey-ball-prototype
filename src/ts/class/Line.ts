@@ -4,7 +4,9 @@ import { GameObject } from "./GameObject.js";
 export class Line extends GameObject {
     pos2;
 
-    constructor(v1, v2) {
+    lineWidth;
+
+    constructor(v1, v2, color='#FF0000', lineWidth=1) {
         super({
             x: v1[0], y: v1[1], z: v1[2],
             width: v2[0], height: v2[1], depth: v2[2]
@@ -16,7 +18,9 @@ export class Line extends GameObject {
 
         this.affectedByPhysics = false;
 
-        this.color = '#FF0000';
+        this.color = color;
+
+        this.lineWidth = lineWidth;
     }
 
     draw(ctx: CanvasRenderingContext2D) {
@@ -24,6 +28,7 @@ export class Line extends GameObject {
         const v2 = game.camera.vProject(this.pos2);
 
         ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.lineWidth;
         ctx.beginPath();
         ctx.moveTo(v1.x, v1.y);
         ctx.lineTo(v2.x, v2.y);
