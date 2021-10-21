@@ -75,8 +75,10 @@ export class Game {
         1: 0
     }
 
-    scoreLimit: number = 3;
-    timeLimit: number = 0;
+    scoreLimit: number;
+    timeLimit: number;
+
+    gameController: AbortController;
 
     //   multiplied with vel
     airResistance: vec3 = vec3.fromValues(0.9, 1, 0.9);
@@ -248,7 +250,6 @@ export class Game {
         const data = JSON.parse(localStorage.getItem('save-data'));
 
         if (data) {
-            this.setupGame();
         } else {
             this.clearData();
         }
@@ -291,10 +292,36 @@ export class Game {
     }
 
     btnSetupDone() {
-        this.scoreLimit = Number((<HTMLInputElement>this.setupScreen.querySelector('#score-limit')).value) || 3;
-        this.timeLimit = Number((<HTMLInputElement>this.setupScreen.querySelector('#time-limit')).value) || Infinity;
+        this.setupGame({
+            scoreLimit:Number((<HTMLInputElement>this.setupScreen.querySelector('#score-limit')).value) || 3,
+            timeLimit: Number((<HTMLInputElement>this.setupScreen.querySelector('#time-limit')).value) || Infinity
+        })
+
         this.setupScreen.style.display = 'none';
         this.unpause();
+    }
+
+    setupGame(gameOptions) {
+        this.scoreLimit = gameOptions.scoreLimit;
+        this.timeLimit = gameOptions.timeLimit;
+        this.addUi();
+        this.resetMatch();
+    }
+
+    resetMatch() {
+        this.gameController = new AbortController();
+
+        this.gameObjects = [
+            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0 }),
+            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: -30, team: 1 }),
+            new Sphere({ x: 0, y: 0, z: 0, r: this.ballSize }),
+            new Sphere({ x: 0, y: 0, z: 100, r: this.ballSize }),
+            new Sphere({ x: 0, y: 0, z: -100, r: this.ballSize }),
+        ];
+
+        this.addCourtLines();
+
+        this.scores = { 0: 0, 1: 0 };
     }
 
     btnGameoverOk() {
@@ -356,12 +383,6 @@ export class Game {
 
     get allObjects() {
         return [...this.gameObjects, ...this.uiObjects]
-    }
-
-    setupGame() {
-        this.addCourtLines();
-        this.addUi();
-        this.resetMatch();
     }
 
     addCourtLines() {
@@ -439,20 +460,6 @@ export class Game {
     addUi() {
         this.uiObjects.push(new Scoreboard({ pos: [this.playfield.x + 48, this.playfield.y - 64], team: 0 }));
         this.uiObjects.push(new Scoreboard({ pos: [-1 * (this.playfield.x) - 48 * 2, this.playfield.y - 64], team: 1 }));
-    }
-
-    resetMatch() {
-        this.gameObjects = [
-            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0 }),
-            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: -30, team: 1 }),
-            new Sphere({ x: 0, y: 0, z: 0, r: this.ballSize }),
-            new Sphere({ x: 0, y: 0, z: 100, r: this.ballSize }),
-            new Sphere({ x: 0, y: 0, z: -100, r: this.ballSize }),
-        ];
-
-        this.addCourtLines();
-
-        this.scores = { 0: 0, 1: 0 };
     }
 
     addScore(team, points) {
