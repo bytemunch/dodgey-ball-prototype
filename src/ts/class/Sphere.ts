@@ -21,7 +21,7 @@ export class Sphere extends GameObject {
         super({ ...o, depth: o.r * 2, height: o.r * 2, width: o.r * 2 })
 
         this.r = o.r;
-        this.color = `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255} )`;
+        this.color = `#0000FF`;
     }
 
     get atRest() {
@@ -180,11 +180,11 @@ export class Sphere extends GameObject {
         ctx.fillStyle = this.color;
 
         switch (this.thrownBy) {
-            case 1:
-                ctx.fillStyle = '#FF0000'
+            case 0:
+                ctx.fillStyle = '#FFFF00'
                 break;
-            case 2:
-                ctx.fillStyle = '#FF00FF'
+            case 1:
+                ctx.fillStyle = '#00FFFF'
                 break;
         }
 
