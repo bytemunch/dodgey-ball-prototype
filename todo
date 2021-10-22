@@ -4,3 +4,5 @@ BUG player flies up when not focused?
     Only balls fly up now?
 
 SPEEDUP move UIObjects over to interface canvas, and only redraw on update
+
+ART try rotoscoping in SVG

@@ -225,8 +225,8 @@ export class DodgeyBall extends Game {
 
         this.pause(false);
 
+        if (winner) this.gameoverScreen.querySelector('h3').textContent = `${winner ? 'Cyan' : 'Yellow'} Wins by ${reason == 'score' ? `reaching the score limit of ${this.scoreLimit}` : `running out the clock`}!`;
         if (winner == 2) this.gameoverScreen.querySelector('h3').textContent = `It's a draw!`;
-        if (winner) this.gameoverScreen.querySelector('h3').textContent = `${winner ? 'Cyan' : 'Yellow'} Wins by ${reason == 'score' ? `reaching score limit of${this.scoreLimit}` : `running out the clock`}!`;
         this.gameoverScreen.style.display = 'block';
     }
 
