@@ -17,6 +17,8 @@ export class Player extends GameObject {
 
     iframes: number = 10;
 
+    controllerDebounce = 0;
+
     constructor(o) {
         super(o);
 
@@ -56,7 +58,8 @@ export class Player extends GameObject {
         // set target velocity
         if (this.controller) {
             // movement
-            this.applyForce(vec3.fromValues(this.controller.axes[0], 0, -this.controller.axes[1]));
+            let direction = vec3.fromValues(this.controller.axes[0], 0, -this.controller.axes[1]);
+            this.applyForce(direction);
 
             // targeting
             this.target = vec3.fromValues(
@@ -67,7 +70,10 @@ export class Player extends GameObject {
 
             this.target[2] *= -1;
 
+            if (vec3.equals(this.target, [0, 0, 0])) this.target = vec3.clone(direction);
+
             vec3.normalize(this.target, this.target);
+
 
             vec3.scale(this.target, this.target, 50);
 
@@ -80,8 +86,20 @@ export class Player extends GameObject {
 
             // shoota
             if (this.controller.buttons[5].pressed) this.shoot(false);
-            if (this.controller.buttons[7].pressed) this.shoot(true);
-            if (this.controller.buttons[6].pressed) this.pickupBall();
+
+            this.controllerDebounce--;
+
+            if (this.controller.buttons[6].pressed || this.controller.buttons[7].pressed) {
+                if (this.controllerDebounce<=0) {
+                    this.controllerDebounce = 20;
+
+                    if (this.hasBall) {
+                        this.shoot(true);
+                    } else {
+                        this.pickupBall();
+                    }
+                }
+            }
 
             this.iframes > 0 ? this.iframes-- : this.iframes = 0;
         }
