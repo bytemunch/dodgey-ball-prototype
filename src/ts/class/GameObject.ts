@@ -44,7 +44,7 @@ export class GameObject {
         vec3.add(this.acc, this.acc, f);
     }
 
-    update() {
+    update(t?) {
         if (this.affectedByPhysics) {
             this.applyForce(game.gravity);
 

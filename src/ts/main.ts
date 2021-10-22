@@ -1,6 +1,6 @@
-import { Game } from "./class/Game.js";
+import { DodgeyBall } from "./class/DodgeyBall.js";
 
-export let game: Game;
+export let game: DodgeyBall;
 
 import { vec3 } from './lib/gl-matrix/index.js'
 
@@ -8,7 +8,7 @@ import { vec3 } from './lib/gl-matrix/index.js'
 window.addEventListener('DOMContentLoaded', () => {
     console.log('DOM Loaded!');
 
-    game = new Game;
+    game = new DodgeyBall;
 
     game.postInit();
 

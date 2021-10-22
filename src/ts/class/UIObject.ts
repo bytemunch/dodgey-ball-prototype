@@ -18,7 +18,7 @@ export class UIObject {
         this.size = vec2.fromValues(48, 48);
     }
 
-    update() {
+    update(t?) {
 
     }
 
