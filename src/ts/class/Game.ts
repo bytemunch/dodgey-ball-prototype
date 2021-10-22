@@ -429,13 +429,12 @@ export class Game {
         }
     }
 
-    // TODO dont pass winner here, use score vars
     gameOver() {
         let winner;
         if (this.scores[0] > this.scores[1]) {
             winner = 0;
         }
-        if (this.scores[0] > this.scores[1]) {
+        if (this.scores[0] < this.scores[1]) {
             winner = 1;
         }
         if (this.scores[0] == this.scores[1]) {
