@@ -10,7 +10,7 @@ export class CameraXY extends Camera {
     projectionCy: number;
 
     update(sr) {
-        this.perspective = (568) * sr;
+        this.perspective = (568);
         this.projectionCx = (568 / 2) * sr;
         this.projectionCy = (320 / 2) * sr;
     }
