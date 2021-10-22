@@ -17,10 +17,9 @@ export class Camera {
     }
 
     update(sr) {
-        // TODO hardcoded! bad!
-        this.perspective = (568) * 0.8;
-        this.projectionCx = (568 / 2) * sr;
-        this.projectionCy = (320 / 4) * sr;
+        this.perspective = (game.playfield.width) * 0.8;
+        this.projectionCx = (game.playfield.width / 2) * sr;
+        this.projectionCy = (game.playfield.height / 4) * sr;
         this.camZ = 320;
 
         this.sr = sr;

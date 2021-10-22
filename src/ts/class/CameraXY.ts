@@ -10,9 +10,9 @@ export class CameraXY extends Camera {
     projectionCy: number;
 
     update(sr) {
-        this.perspective = (568);
-        this.projectionCx = (568 / 2) * sr;
-        this.projectionCy = (320 / 2) * sr;
+        this.perspective = (game.playfield.width);
+        this.projectionCx = (game.playfield.width / 2) * sr;
+        this.projectionCy = (game.playfield.height / 2) * sr;
     }
 
     project2D(o: UIObject) {
