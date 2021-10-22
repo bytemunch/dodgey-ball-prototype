@@ -28,14 +28,6 @@ export class Game {
     iCnv: HTMLCanvasElement;
     iCtx: CanvasRenderingContext2D;
 
-    // Top-Down Canvas
-    zCnv: HTMLCanvasElement;
-    zCtx: CanvasRenderingContext2D;
-
-    // XY Canvas
-    yCnv: HTMLCanvasElement;
-    yCtx: CanvasRenderingContext2D;
-
     // DOM stuff
     touchTarget: HTMLDivElement;
     containerDiv: HTMLDivElement;
@@ -45,8 +37,6 @@ export class Game {
     setupScreen: HTMLDivElement;
     gameoverScreen: HTMLDivElement;
 
-    playfield: { x: number, y: number, z: number, width: number, height: number, depth: number, floor: number };
-
     // Timing
     timeFactor: number = 0;
     prevFrameTime = 0;
@@ -55,8 +45,6 @@ export class Game {
     framecount = 0;
 
     sizeRatio = 0;
-    zSizeRatio = 0;
-    ySizeRatio = 0;
 
     loopHandle;
 
@@ -65,10 +53,10 @@ export class Game {
     gamepadMgr: GamepadManager;
 
     // Game stuff
+    playfield: { x: number, y: number, z: number, width: number, height: number, depth: number, floor: number };
+
     gameObjects: GameObject[];
     uiObjects: UIObject[];
-
-    ballSize = 20;
 
     gravity: vec3 = vec3.fromValues(0, 0.8, 0);
 
@@ -82,13 +70,11 @@ export class Game {
     scoreLimit: number = 0;
     timeLimit: number = Infinity;
 
+    ballSize = 20;
     ballsOneSidedSince: number;
     ballOneSidedTimeLimit: number = 5000;
 
     matchTimerController: AbortController;
-
-    //   multiplied with vel
-    airResistance: vec3 = vec3.fromValues(0.9, 1, 0.9);
 
     constructor() {
         this.playfield = {
@@ -110,11 +96,56 @@ export class Game {
         this.setupScreen = document.querySelector('#setup-match');
 
         // Create canvases
-        this.cnv = document.createElement('canvas');
-        this.cnv.id = 'game-canvas';
+        this.createCanvas();
 
+        // Append canvases to document in #main-game
+        this.containerDiv.appendChild(this.cnv);
+        this.containerDiv.appendChild(this.iCnv);
+
+        // setup vars
+        this.gameObjects = [];
+        this.uiObjects = [];
+
+        this.audioMgr = new AudioManager;
+        this.mouseTouchMgr = new MouseTouchManager(this.touchTarget);
+        this.gamepadMgr = new GamepadManager;
+
+        // Add listeners
+        // resize canvas on window resize
+        window.addEventListener('resize', e => {
+            this.onResize();
+        })
+
+        // Add button listeners
+        // TODO tidy this by using onclicks? Or something somehow more automatic
+        this.pauseMenu.querySelector('#resume').addEventListener('click', this.btnResume.bind(this));
+        this.pauseMenu.querySelector('#save-quit').addEventListener('click', this.btnSaveQuit.bind(this));
+        this.splashScreen.querySelector('#play').addEventListener('click', this.btnPlay.bind(this));
+        this.splashScreen.querySelector('#clear-data').addEventListener('click', this.btnClearData.bind(this));
+        this.containerDiv.querySelectorAll('.audio-toggle').forEach(e => e.addEventListener('click', this.btnToggleAudio.bind(this)));
+        this.setupScreen.querySelector('#setup-done').addEventListener('click', this.btnSetupDone.bind(this));
+        this.gameoverScreen.querySelector('#gameover-ok').addEventListener('click', this.btnGameoverOk.bind(this));
+    }
+
+    postInit() {
+        this.loadData();
+
+        // init cameras
         this.camera = new Camera(this.cnv);
         this.cameraXY = new CameraXY(this.cnv);
+
+        // setup initial canvas sizes
+        this.onResize();
+
+        this.addUi();
+
+        // begin main loop
+        this.loopHandle = requestAnimationFrame(this.loop.bind(this));
+    }
+
+    createCanvas() {
+        this.cnv = document.createElement('canvas');
+        this.cnv.id = 'game-canvas';
 
         this.ctx = this.cnv.getContext('2d');
 
@@ -122,83 +153,6 @@ export class Game {
         this.iCnv.id = 'interface-canvas';
 
         this.iCtx = this.iCnv.getContext('2d');
-
-        this.zCnv = document.createElement('canvas');
-        this.zCnv.id = 'topdown-canvas';
-
-        this.zCtx = this.zCnv.getContext('2d');
-
-        this.yCnv = document.createElement('canvas');
-        this.yCnv.id = 'xy-canvas';
-
-        this.yCtx = this.yCnv.getContext('2d');
-
-        // setup initial canvas sizes
-        this.onResize();
-
-        // Append canvases to document in #main-game
-        this.containerDiv.appendChild(this.cnv);
-        this.containerDiv.appendChild(this.iCnv);
-        this.containerDiv.appendChild(this.zCnv);
-        this.containerDiv.appendChild(this.yCnv);
-
-        // resize canvas on window resize
-        window.addEventListener('resize', e => {
-            this.onResize();
-        })
-
-        // setup vars
-        this.gameObjects = [];
-        this.uiObjects = [];
-
-        // Add button listeners
-        this.pauseMenu.querySelector('#resume').addEventListener('click', this.btnResume.bind(this));
-        this.pauseMenu.querySelector('#save-quit').addEventListener('click', this.btnSaveQuit.bind(this));
-        this.splashScreen.querySelector('#play').addEventListener('click', this.btnPlay.bind(this));
-        this.splashScreen.querySelector('#clear-data').addEventListener('click', this.btnClearData.bind(this));
-        this.containerDiv.querySelectorAll('.audio-toggle').forEach(e => e.addEventListener('click', this.btnToggleAudio.bind(this)));
-
-        this.setupScreen.querySelector('#setup-done').addEventListener('click', this.btnSetupDone.bind(this));
-        this.gameoverScreen.querySelector('#gameover-ok').addEventListener('click', this.btnGameoverOk.bind(this));
-
-        this.audioMgr = new AudioManager;
-
-        this.mouseTouchMgr = new MouseTouchManager(this.touchTarget);
-
-        this.gamepadMgr = new GamepadManager;
-    }
-
-    // Resizing functions
-    // NOTE only resize objects on DRAW not on creation
-    //  to keep the physics the same across screen sizes
-    rs(n) {
-        return n * this.sizeRatio;
-    }
-    rs2(n) {
-        return n / this.sizeRatio;
-    }
-
-    rsZ(n) {
-        return n * this.zSizeRatio;
-    }
-    rsZ2(n) {
-        return n / this.zSizeRatio;
-    }
-
-    rsY(n) {
-        return n * this.ySizeRatio;
-    }
-    rsY2(n) {
-        return n / this.ySizeRatio;
-    }
-
-    postInit() {
-        this.loadData();
-
-        this.addUi();
-
-        // begin main loop
-        this.loopHandle = requestAnimationFrame(this.loop.bind(this));
     }
 
     onResize() {
@@ -210,30 +164,14 @@ export class Game {
         this.cnv.width = this.containerBB.width;
         this.cnv.height = this.containerBB.height;
 
-        this.yCnv.width = this.containerBB.width / 2;
-        this.yCnv.height = this.containerBB.height / 2;
-
-        this.zCnv.width = this.containerBB.width / 2;
-        this.zCnv.height = this.containerBB.height / 2;
-
         // Get ratio to resize objects by
         this.sizeRatio = this.containerBB.width / this.playfield.width;
-        this.zSizeRatio = (this.containerBB.width / this.playfield.width) / 2;
-        this.ySizeRatio = (this.containerBB.width / this.playfield.width) / 2;
-
-        // this.zCtx.translate(this.containerBB.width / 4, this.containerBB.height / 4);
-        this.zCtx.translate(
-            -this.rsZ(this.playfield.x),
-            -this.rsZ(this.playfield.z),
-        );
-        this.zCtx.transform(1, 0, 0, -1, 0, 0);
-
-        this.yCtx.translate(-this.rsY(this.playfield.x), -this.rsY(this.playfield.y));
 
         this.camera.update(this.sizeRatio);
         this.cameraXY.update(this.sizeRatio);
     }
 
+    // SAVE/LOAD
     clearData() {
         const emptySaveData = {
             'empty': 'save'
@@ -261,6 +199,7 @@ export class Game {
         }
     }
 
+    // BUTTONS
     btnToggleAudio() {
         if (this.audioMgr.muted) {
             document.querySelectorAll('.audio-toggle').forEach(e => e.classList.remove('disabled'));
@@ -307,40 +246,12 @@ export class Game {
         this.unpause();
     }
 
-    setupGame(gameOptions) {
-        this.scoreLimit = gameOptions.scoreLimit;
-        this.timeLimit = gameOptions.timeLimit;
-        this.resetMatch();
-    }
-
-    resetMatch() {
-        this.matchTimerController = new AbortController();
-
-        // countdown callback! second timer
-        animationInterval(1000, this.matchTimerController.signal, time => {
-            this.timeLimit--;
-        });
-
-        this.gameObjects = [
-            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0 }),
-            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: -30, team: 1 }),
-            new Sphere({ x: 0, y: 0, z: 0, r: this.ballSize }),
-            new Sphere({ x: 0, y: 0, z: 100, r: this.ballSize }),
-            new Sphere({ x: 0, y: 0, z: -100, r: this.ballSize }),
-        ];
-
-        this.addCourtLines();
-
-        this.scores = { 0: 0, 1: 0 };
-
-        this.inplay = true;
-    }
-
     btnGameoverOk() {
         this.gameoverScreen.style.display = 'none';
         this.setupScreen.style.display = 'block';
     }
 
+    // PAUSING
     pause(showMenu: boolean = true) {
         this.audioMgr.play('click');
 
@@ -395,6 +306,35 @@ export class Game {
 
     get allObjects() {
         return [...this.gameObjects, ...this.uiObjects]
+    }
+
+    setupGame(gameOptions) {
+        this.scoreLimit = gameOptions.scoreLimit;
+        this.timeLimit = gameOptions.timeLimit;
+        this.resetMatch();
+    }
+
+    resetMatch() {
+        this.matchTimerController = new AbortController();
+
+        // countdown callback! second timer
+        animationInterval(1000, this.matchTimerController.signal, time => {
+            this.timeLimit--;
+        });
+
+        this.gameObjects = [
+            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0 }),
+            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: -30, team: 1 }),
+            new Sphere({ x: 0, y: 0, z: 0, r: this.ballSize }),
+            new Sphere({ x: 0, y: 0, z: 100, r: this.ballSize }),
+            new Sphere({ x: 0, y: 0, z: -100, r: this.ballSize }),
+        ];
+
+        this.addCourtLines();
+
+        this.scores = { 0: 0, 1: 0 };
+
+        this.inplay = true;
     }
 
     addCourtLines() {
@@ -481,7 +421,7 @@ export class Game {
         this.uiObjects.push(new Timer({ pos: [(this.playfield.x + this.playfield.width / 2) - 48 / 2, this.playfield.y - 64] }));
     }
 
-    addScore(team, points) {
+    addToScore(team, points) {
         this.scores[team] += points;
 
         if (this.scores[team] >= this.scoreLimit) {
@@ -554,19 +494,8 @@ export class Game {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.iCtx.clearRect(0, 0, this.iCtx.canvas.width, this.iCtx.canvas.height);
 
-        this.yCtx.clearRect(this.rsY(this.playfield.x), this.rsY(this.playfield.y), this.yCtx.canvas.width, this.yCtx.canvas.height);
-
-        // Clear negative Y vals as we are mirrored
-        this.zCtx.clearRect(this.rsZ(this.playfield.x), -this.rsZ(this.playfield.z), this.zCtx.canvas.width, -this.zCtx.canvas.height);
-
         // Gamepad Input
         this.gamepadMgr.refreshStates();
-
-        if (this.gamepadMgr.gamepads[0]) {
-            for (let b of this.gamepadMgr.gamepads[0].buttons) {
-                // if (b.value) console.log('Button %d pressed!', this.gamepadMgr.gamepads[0].buttons.indexOf(b));
-            }
-        }
 
         // Removal
         for (let i = this.gameObjects.length - 1; i > 0; i--) {
@@ -588,10 +517,6 @@ export class Game {
         // update everything
         for (let o of this.allObjects.sort((a, b) => b.cz - a.cz).sort((a, b) => 0 - Number(a.is == 'line'))) {
             o.draw(this.ctx);
-
-            const cgo = o as GameObject;
-            if (cgo.drawXZ) cgo.drawXZ(this.zCtx);
-            if (cgo.drawXY) cgo.drawXY(this.yCtx);
         }
 
         if (this.inplay) {

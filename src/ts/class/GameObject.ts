@@ -176,27 +176,6 @@ export class GameObject {
             this.height * this.projectedScale
         );
     }
-
-    // DEBUG
-    drawXZ(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(
-            game.rsZ(this.x),
-            game.rsZ(this.z),
-            game.rsZ(this.width),
-            game.rsZ(this.depth)
-        );
-    }
-
-    drawXY(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(
-            game.rsY(this.x),
-            game.rsY(this.y),
-            game.rsY(this.width),
-            game.rsY(this.height)
-        );
-    }
 }
 
 interface GameObjectOptions {

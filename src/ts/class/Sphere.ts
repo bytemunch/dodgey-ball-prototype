@@ -199,22 +199,6 @@ export class Sphere extends GameObject {
         ctx.closePath();
         ctx.fill();
     }
-
-    drawXY(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(game.rsY(this.pos[0]), game.rsY(this.pos[1]), game.rsY(this.r), 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.fill();
-    }
-
-    drawXZ(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(game.rsZ(this.pos[0]), game.rsZ(this.pos[2]), game.rsZ(this.r), 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.fill();
-    }
 }
 
 interface SphereOptions {

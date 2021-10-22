@@ -48,7 +48,7 @@ export class Player extends GameObject {
     hit(s: Sphere) {
         if (this.iframes) return;
         if (s.thrownBy == this.team) return;
-        game.addScore(this.team ? 0 : 1, 1);
+        game.addToScore(this.team ? 0 : 1, 1);
         this.iframes = 30;
     }
 
