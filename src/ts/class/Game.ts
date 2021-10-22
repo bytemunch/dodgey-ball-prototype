@@ -485,11 +485,22 @@ export class Game {
         this.scores[team] += points;
 
         if (this.scores[team] >= this.scoreLimit) {
-            this.gameOver(team);
+            this.gameOver();
         }
     }
 
-    gameOver(winner = null) {
+    // TODO dont pass winner here, use score vars
+    gameOver() {
+        let winner;
+        if (this.scores[0] > this.scores[1]) {
+            winner = 0;
+        }
+        if (this.scores[0] > this.scores[1]) {
+            winner = 1;
+        }
+        if (this.scores[0] == this.scores[1]) {
+            winner = 2;
+        }
         this.inplay = false;
         this.matchTimerController.abort();
         // TEAM WINS
@@ -497,7 +508,7 @@ export class Game {
 
         this.pause(false);
 
-        if (!winner) this.gameoverScreen.querySelector('h3').textContent = `It's a draw!`;
+        if (winner == 2) this.gameoverScreen.querySelector('h3').textContent = `It's a draw!`;
         if (winner) this.gameoverScreen.querySelector('h3').textContent = `${winner ? 'Cyan' : 'Yellow'} Wins!`;
         this.gameoverScreen.style.display = 'block';
     }
