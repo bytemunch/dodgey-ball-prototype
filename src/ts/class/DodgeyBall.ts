@@ -1,6 +1,7 @@
 import { vec3 } from "../lib/gl-matrix/index.js";
 import { animationInterval } from "../lib/timer/1.js";
 import { Ballswap } from "./Ballswap.js";
+import { Countdown } from "./Countdown.js";
 import { Game } from "./Game.js";
 import { Line } from "./Line.js";
 import { Player } from "./Player.js";
@@ -23,6 +24,8 @@ export class DodgeyBall extends Game {
 
     scoreLimit: number = 0;
     timeLimit: number = Infinity;
+
+    countdown = 3;
 
     ballSize = 20;
     ballsOneSidedSince: number;
@@ -81,12 +84,6 @@ export class DodgeyBall extends Game {
     }
 
     resetMatch() {
-        this.matchTimerController = new AbortController();
-
-        // countdown callback! second timer
-        animationInterval(1000, this.matchTimerController.signal, time => {
-            this.timeLimit--;
-        });
 
         this.gameObjects = [
             new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0 }),
@@ -100,7 +97,20 @@ export class DodgeyBall extends Game {
 
         this.scores = { 0: 0, 1: 0 };
 
-        this.inplay = true;
+        this.matchTimerController = new AbortController();
+
+        this.countdown = 3;
+        // countdown callback! second timer
+        animationInterval(1000, this.matchTimerController.signal, time => {
+            if (this.countdown < 0) {
+                this.timeLimit--;
+            } else if (this.countdown == 1) {
+                this.inplay = true;
+                this.countdown--;
+            } else {
+                this.countdown--;
+            }
+        });
     }
 
     addCourtLines() {
@@ -186,17 +196,18 @@ export class DodgeyBall extends Game {
         this.uiObjects.push(new Scoreboard({ pos: [-1 * (this.playfield.x) - 48 * 2, this.playfield.y - 64], team: 1 }));
         this.uiObjects.push(new Timer({ pos: [(this.playfield.x + this.playfield.width / 2) - 48 / 2, this.playfield.y - 64] }));
         this.uiObjects.push(new Ballswap({ pos: [0, 0] }));
+        this.uiObjects.push(new Countdown({ pos: [0, 0] }));
     }
 
     addToScore(team, points) {
         this.scores[team] += points;
 
         if (this.scores[team] >= this.scoreLimit) {
-            this.gameOver();
+            this.gameOver('score');
         }
     }
 
-    gameOver() {
+    gameOver(reason) {
         let winner;
         if (this.scores[0] > this.scores[1]) {
             winner = 0;
@@ -215,7 +226,7 @@ export class DodgeyBall extends Game {
         this.pause(false);
 
         if (winner == 2) this.gameoverScreen.querySelector('h3').textContent = `It's a draw!`;
-        if (winner) this.gameoverScreen.querySelector('h3').textContent = `${winner ? 'Cyan' : 'Yellow'} Wins!`;
+        if (winner) this.gameoverScreen.querySelector('h3').textContent = `${winner ? 'Cyan' : 'Yellow'} Wins by ${reason == 'score' ? `reaching score limit of${this.scoreLimit}` : `running out the clock`}!`;
         this.gameoverScreen.style.display = 'block';
     }
 
@@ -236,7 +247,7 @@ export class DodgeyBall extends Game {
     }
 
     get players() {
-        return this.gameObjects.filter(o=>o.is=='player');
+        return this.gameObjects.filter(o => o.is == 'player');
     }
 
     moveAllBallsToSide() {
@@ -278,12 +289,12 @@ export class DodgeyBall extends Game {
             }
 
             if (this.timeLimit <= 0) {
-                this.gameOver();
+                this.gameOver('time');
                 this.timeLimit = Infinity;
             }
         }
 
-        
+
         // update UI
         // TODO off main loop. only when updated!
         for (let o of this.uiObjects) {

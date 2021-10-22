@@ -56,7 +56,7 @@ export class Player extends GameObject {
         // leggooooo
 
         // set target velocity
-        if (this.controller) {
+        if (this.controller && game.inplay) {
             // movement
             let direction = vec3.fromValues(this.controller.axes[0], 0, -this.controller.axes[1]);
             this.applyForce(direction);
@@ -74,7 +74,6 @@ export class Player extends GameObject {
 
             vec3.normalize(this.target, this.target);
 
-
             vec3.scale(this.target, this.target, 50);
 
             const tv1 = vec3.add([], [this.center[0], this.center[1], this.z], [0, this.height / 2, 0])
@@ -90,7 +89,7 @@ export class Player extends GameObject {
             this.controllerDebounce--;
 
             if (this.controller.buttons[6].pressed || this.controller.buttons[7].pressed) {
-                if (this.controllerDebounce<=0) {
+                if (this.controllerDebounce <= 0) {
                     this.controllerDebounce = 20;
 
                     if (this.hasBall) {
