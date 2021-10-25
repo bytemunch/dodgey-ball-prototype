@@ -1,0 +1,19 @@
+#pause-menu .title {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#pause-menu #resume {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+#pause-menu #save-quit {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+#pause-menu ce-audio-toggle {
+    grid-column: 3;
+    grid-row: 3;
+}

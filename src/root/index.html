@@ -141,41 +141,64 @@
 
 <body>
     <div id="main-game">
-        <div id="splash" class="fullscreen" style="display: block;">
-            <img src="img/logo.png" alt="" class="logo">
-            <button id="play" class="fs-btn-1">Play</button>
-            <button id="clear-data" class="fs-btn-3">Clear Data</button>
-            <button class="audio-toggle"></button>
-        </div>
-        <div id="pause-menu" class="fullscreen">
-            <img src="img/logo.png" alt="" class="logo">
-            <button id="resume" class="fs-btn-1">Resume</button>
-            <button id="save-quit" class="fs-btn-2">Save & Quit</button>
-            <button class="audio-toggle"></button>
-        </div>
-        <div id="advert" class="fullscreen">
-            <h2>UhOh!</h2>
-            <h3>Advert time!</h3>
-            <p id='countdown'>Skipping in 5...</p>
-            <a href="https://www.effectivecpmgate.com/x2uabykf?key=e79be3ae08606befebfff5f871c7fa5f">
-                <img src="img/ad.png" alt="">
-            </a>
-        </div>
-        <div id="gameover" class="fullscreen">
-            <h2>Game Over!</h2>
-            <h3>TEAM wins!</h3>
-            <button id="gameover-ok">OK</button>
-        </div>
-        <div id="setup-match" class="fullscreen">
-            <h2>Match Setup</h2>
-            <label for="score-limit">Score Limit</label>
-            <input type="number" id="score-limit" placeholder="3" value="3">
-            <label for="time-limit">Time Limit</label>
-            <input type="number" id="time-limit" placeholder="0">
-            <button id="setup-done">Start!</button>
-        </div>
         <div id="touch-target" class="fullscreen"></div>
     </div>
+
+    <template id="splash-template">
+        <div id="splash-screen" class="menu-grid">
+            <img src="img/logo.png" alt="Logo" class='logo'>
+            <button id='play' class="big green">Play</button>
+            <button id='clear-data' class="small red">Clear Data</button>
+            <!-- <button class="audio-toggle">Audio Toggle Button</button> -->
+            <ce-audio-toggle></ce-audio-toggle>
+        </div>
+    </template>
+
+    <template id="setup-template">
+        <div id="setup-screen" class="menu-grid">
+            <h1 class="title">Match Setup</h1>
+            <label for="setup-input-score">Score Limit</label>
+            <button id="setup-score-lower" class="lower blue">-</button>
+            <input type="number" id='setup-input-score' class='' value='3'>
+            <button id="setup-score-higher" class="higher blue">+</button>
+    
+            <label for="setup-input-time">Time Limit</label>
+            <button id="setup-time-lower" class="lower blue">-</button>
+            <input type="number" id='setup-input-time' class='' value='30'>
+            <button id="setup-time-higher" class="higher blue">+</button>
+    
+            <button id="play" class="big green">Start</button>
+            <button class="small red" id="back">Back</button>
+        </div>
+    </template>
+
+    <template id="controller-template">
+        <div id="controller-setup" class="menu-grid">
+            <h1 class='title'>Controller Setup</h1>
+            <button id="controller-1" class="controller-button gamepad">Player 1</button>
+            <button id="controller-2" class="controller-button kbm">Player 2</button>
+            <button class="wide green" id="done">Done</button>
+            <button class="small red" id="back">Back</button>
+        </div>
+    </template>
+
+    <template id="gameover-template">
+        <div id="gameover" class='menu-grid'>
+            <h1 class="title">Game Over!</h1>
+            <h2 class="subtitle">TEAM NAME HERE won by WIN SCENARIO HERE!</h2>
+            <button id="continue" class='wide green'>Continue</button>
+        </div>
+    </template>
+
+    <template id="pause-template">
+        <div id="pause-menu" class="menu-grid">
+            <h1 class='title'>Paused</h1>
+            <button id="resume" class='big green'>Resume</button>
+            <button id="save-quit" class='small red'>Save & Quit</button>
+    
+            <ce-audio-toggle></ce-audio-toggle>
+        </div>
+    </template>
 </body>
 
 </html>

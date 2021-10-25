@@ -1,0 +1,64 @@
+#setup-screen {
+    grid-template-columns: 1fr 48px auto 48px 1fr;
+    grid-template-rows: 0.5fr 0.5fr 0.5fr 0.5fr 0.5fr 1fr 1fr;
+}
+
+.lower,
+.higher {
+    font-size: 2em;
+}
+
+#setup-screen .title {
+    grid-column: 2/5;
+    grid-row: 1;
+}
+
+#setup-screen label[for='setup-input-score'] {
+    grid-column: 2/5;
+    grid-row: 2;
+}
+
+#setup-screen #setup-score-lower {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+#setup-screen #setup-input-score {
+    grid-column: 3;
+    grid-row: 3;
+}
+
+#setup-screen #setup-score-higher {
+    grid-column: 4;
+    grid-row: 3;
+}
+
+#setup-screen label[for='setup-input-time'] {
+    grid-column: 2/5;
+    grid-row: 4;
+}
+
+#setup-screen #setup-time-lower {
+    grid-column: 2;
+    grid-row: 5;
+}
+
+#setup-screen #setup-input-time {
+    grid-column: 3;
+    grid-row: 5;
+}
+
+#setup-screen #setup-time-higher {
+    grid-column: 4;
+    grid-row: 5;
+}
+
+#setup-screen #play {
+    grid-column: 2/5;
+    grid-row: 6;
+}
+
+#setup-screen #back {
+    grid-column: 1/3;
+    grid-row: 1/3;
+}

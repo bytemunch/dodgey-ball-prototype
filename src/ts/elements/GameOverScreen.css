@@ -1,0 +1,19 @@
+#gameover {
+    grid-template-columns: 0.5fr 1fr 1fr 1fr 0.5fr;
+    grid-template-rows: 1fr 1fr 1fr;
+}
+
+#gameover .title {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+#gameover .subtitle {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+#gameover #continue {
+    grid-column: 3;
+    grid-row: 3;
+}

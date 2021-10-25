@@ -1,3 +1,4 @@
+import { GameOverScreen } from "../elements/GameOverScreen.js";
 import { vec3 } from "../lib/gl-matrix/index.js";
 import { animationInterval } from "../lib/timer/1.js";
 import { Ballswap } from "./Ballswap.js";
@@ -10,9 +11,6 @@ import { Sphere } from "./Sphere.js";
 import { Timer } from "./Timer.js";
 
 export class DodgeyBall extends Game {
-    setupScreen: HTMLDivElement;
-    gameoverScreen: HTMLDivElement;
-
     gravity: vec3 = vec3.fromValues(0, 0.8, 0);
 
     inplay: boolean;
@@ -45,37 +43,10 @@ export class DodgeyBall extends Game {
             depth: 320,
             floor: (-320 / 5) + 320
         }
-
-        this.gameoverScreen = document.querySelector('#gameover');
-        this.setupScreen = document.querySelector('#setup-match');
-
-        this.setupScreen.querySelector('#setup-done').addEventListener('click', this.btnSetupDone.bind(this));
-        this.gameoverScreen.querySelector('#gameover-ok').addEventListener('click', this.btnGameoverOk.bind(this));
-    }
-
-    async btnPlay() {
-        this.splashScreen.style.display = 'none';
-        await this.audioMgr.init();
-        this.setupScreen.style.display = 'block';
     }
 
     // Buttons!
-    btnSetupDone() {
-        this.setupGame({
-            scoreLimit: Number((<HTMLInputElement>this.setupScreen.querySelector('#score-limit')).value) || Infinity,
-            timeLimit: Number((<HTMLInputElement>this.setupScreen.querySelector('#time-limit')).value) || Infinity
-        })
-
-        this.setupScreen.style.display = 'none';
-        this.unpause();
-    }
-
-    btnGameoverOk() {
-        this.gameoverScreen.style.display = 'none';
-        this.setupScreen.style.display = 'block';
-    }
-
-    setupGame(gameOptions) {
+    setupGame(gameOptions: { scoreLimit: number, timeLimit: number }) {
         this.scoreLimit = gameOptions.scoreLimit;
         this.timeLimit = gameOptions.timeLimit;
         this.uiObjects = [];
@@ -220,14 +191,12 @@ export class DodgeyBall extends Game {
         }
         this.inplay = false;
         this.matchTimerController.abort();
-        // TEAM WINS
-        console.log('TEAM' + winner + ' WINS!');
 
         this.pause(false);
 
-        if (winner) this.gameoverScreen.querySelector('h3').textContent = `${winner ? 'Cyan' : 'Yellow'} Wins by ${reason == 'score' ? `reaching the score limit of ${this.scoreLimit}` : `running out the clock`}!`;
-        if (winner == 2) this.gameoverScreen.querySelector('h3').textContent = `It's a draw!`;
-        this.gameoverScreen.style.display = 'block';
+        let txt = winner == 2 ? `It's a draw!` : `${winner ? 'Cyan' : 'Yellow'} Wins by ${reason == 'score' ? `reaching the score limit of ${this.scoreLimit}` : `running out the clock`}!`;
+
+        document.querySelector('#main-game').appendChild(new GameOverScreen(txt));
     }
 
     get allBallsLeft() {

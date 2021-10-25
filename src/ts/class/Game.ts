@@ -1,3 +1,4 @@
+import { SplashScreen } from "../elements/SplashScreen.js";
 import { AudioManager } from "./AudioManager.js";
 import { Camera } from "./Camera.js";
 import { CameraXY } from "./CameraXY.js";
@@ -25,8 +26,6 @@ export class Game {
     touchTarget: HTMLDivElement;
     containerDiv: HTMLDivElement;
     containerBB: DOMRect;
-    pauseMenu: HTMLDivElement;
-    splashScreen: HTMLDivElement;
 
     // Timing
     timeFactor: number = 0;
@@ -53,8 +52,6 @@ export class Game {
         // Grab DOM
         this.containerDiv = document.querySelector('#main-game');
         this.touchTarget = document.querySelector('#touch-target');
-        this.pauseMenu = document.querySelector('#pause-menu');
-        this.splashScreen = document.querySelector('#splash');
 
         // Create canvases
         this.createCanvas();
@@ -77,13 +74,6 @@ export class Game {
             // TODO this fires too often, debounce.
             this.onResize();
         })
-
-        // Add button listeners
-        this.pauseMenu.querySelector('#resume').addEventListener('click', this.btnResume.bind(this));
-        this.pauseMenu.querySelector('#save-quit').addEventListener('click', this.btnSaveQuit.bind(this));
-        this.splashScreen.querySelector('#play').addEventListener('click', this.btnPlay.bind(this));
-        this.splashScreen.querySelector('#clear-data').addEventListener('click', this.btnClearData.bind(this));
-        this.containerDiv.querySelectorAll('.audio-toggle').forEach(e => e.addEventListener('click', this.btnToggleAudio.bind(this)));
     }
 
     postInit() {
@@ -95,6 +85,9 @@ export class Game {
 
         // setup initial canvas sizes
         this.onResize();
+
+        // Add splash
+        this.containerDiv.appendChild(new SplashScreen);
 
         // begin main loop
         this.loopHandle = requestAnimationFrame(this.loop.bind(this));
@@ -179,12 +172,10 @@ export class Game {
 
         this.saveData();
         console.log('saved, now quit.');
-        this.splashScreen.style.display = 'block';
-        this.pauseMenu.style.display = 'none';
+        //TODO go to splash screen
     }
 
     async btnPlay() {
-        this.splashScreen.style.display = 'none';
         await this.audioMgr.init();
     }
 
@@ -203,15 +194,14 @@ export class Game {
 
         decreaseTimeFactor();
 
-        // TODO fadein pause menu
-        if (showMenu) this.pauseMenu.style.display = 'block';
+        // TODO show menu
+        if (showMenu) { }
     }
 
     unpause() {
         this.audioMgr.play('click');
 
-        // TODO fadeout pause menu
-        this.pauseMenu.style.display = 'none';
+        // TODO hide menu
 
         // increase timestep to 1
         const increaseTimeFactor = () => {
@@ -271,7 +261,7 @@ export class Game {
         requestAnimationFrame(this.loop.bind(this));
     }
 
-    gameLoop(t:DOMHighResTimeStamp) {
+    gameLoop(t: DOMHighResTimeStamp) {
         // This is where game logic go
     }
 }

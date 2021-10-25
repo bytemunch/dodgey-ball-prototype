@@ -1,0 +1,13 @@
+:host {
+    font-size: 0;
+    background-color: green;
+    background-image: url('../img/audio.png');
+    background-size: contain;
+    width: 48px;
+    height: 48px;
+}
+
+:host(.disabled) {
+    background-color: red;
+    background-image: url('../img/no-audio.png');
+}
