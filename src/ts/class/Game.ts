@@ -5,6 +5,7 @@ import { CameraXY } from "./CameraXY.js";
 import { GameObject } from "./GameObject.js";
 import { GamepadManager } from "./GamepadManager.js";
 import { MouseTouchManager } from "./MouseTouchManager.js";
+import { ScreenManager } from "./ScreenManager.js";
 import { UIObject } from "./UIObject.js";
 
 export class Game {
@@ -41,6 +42,7 @@ export class Game {
     audioMgr: AudioManager;
     mouseTouchMgr: MouseTouchManager;
     gamepadMgr: GamepadManager;
+    screenMgr: ScreenManager;
 
     // Game stuff
     playfield: { x: number, y: number, z: number, width: number, height: number, depth: number, floor: number };
@@ -67,6 +69,7 @@ export class Game {
         this.audioMgr = new AudioManager;
         this.mouseTouchMgr = new MouseTouchManager(this.touchTarget);
         this.gamepadMgr = new GamepadManager;
+        this.screenMgr = new ScreenManager;
 
         // Add listeners
         // resize canvas on window resize
@@ -86,8 +89,7 @@ export class Game {
         // setup initial canvas sizes
         this.onResize();
 
-        // Add splash
-        this.containerDiv.appendChild(new SplashScreen);
+        this.screenMgr.init();
 
         // begin main loop
         this.loopHandle = requestAnimationFrame(this.loop.bind(this));

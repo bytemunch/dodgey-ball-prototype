@@ -1,4 +1,4 @@
-import { ControllerScreen } from "./ControllerScreen.js";
+import { game } from "../main.js";
 import { FullscreenMenu } from "./FullscreenMenu.js";
 
 export class SplashScreen extends FullscreenMenu {
@@ -13,8 +13,7 @@ export class SplashScreen extends FullscreenMenu {
     }
 
     playClicked() {
-        this.parentElement.appendChild(new ControllerScreen);
-        this.parentElement.removeChild(this);
+        game.screenMgr.open('controller');
     }
 
     clearDataClicked() {

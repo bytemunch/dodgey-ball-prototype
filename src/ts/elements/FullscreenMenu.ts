@@ -6,4 +6,12 @@ export class FullscreenMenu extends CustomElement {
         super.connectedCallback();
         this.classList.add('fs-menu');
     }
+
+    show() {
+        this.style.display = 'block';
+    }
+
+    hide() {
+        this.style.display = 'none';
+    }
 };

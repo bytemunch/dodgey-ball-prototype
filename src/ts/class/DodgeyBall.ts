@@ -1,4 +1,3 @@
-import { GameOverScreen } from "../elements/GameOverScreen.js";
 import { vec3 } from "../lib/gl-matrix/index.js";
 import { animationInterval } from "../lib/timer/1.js";
 import { Ballswap } from "./Ballswap.js";
@@ -196,7 +195,7 @@ export class DodgeyBall extends Game {
 
         let txt = winner == 2 ? `It's a draw!` : `${winner ? 'Cyan' : 'Yellow'} Wins by ${reason == 'score' ? `reaching the score limit of ${this.scoreLimit}` : `running out the clock`}!`;
 
-        document.querySelector('#main-game').appendChild(new GameOverScreen(txt));
+        this.screenMgr.gameOver(txt);
     }
 
     get allBallsLeft() {

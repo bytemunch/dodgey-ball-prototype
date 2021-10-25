@@ -1,6 +1,5 @@
+import { game } from "../main.js";
 import { FullscreenMenu } from "./FullscreenMenu.js";
-import { SetupScreen } from "./SetupScreen.js";
-import { SplashScreen } from "./SplashScreen.js";
 
 export class ControllerScreen extends FullscreenMenu {
     tempID = 'controller';
@@ -15,14 +14,11 @@ export class ControllerScreen extends FullscreenMenu {
     doneButtonPressed() {
         console.log('todo: the controller setting up stuff');
 
-        this.parentElement.appendChild(new SetupScreen);
-        this.parentElement.removeChild(this);
+        game.screenMgr.open('setup');
     }
 
     backButtonPressed() {
-        // game.pageManager.back();
-        this.parentElement.appendChild(new SplashScreen);
-        this.parentElement.removeChild(this);
+        game.screenMgr.back();
     }
 }
 

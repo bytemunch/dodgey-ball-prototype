@@ -1,5 +1,4 @@
 import { game } from "../main.js";
-import { ControllerScreen } from "./ControllerScreen.js";
 import { FullscreenMenu } from "./FullscreenMenu.js";
 
 export class SetupScreen extends FullscreenMenu {
@@ -41,12 +40,13 @@ export class SetupScreen extends FullscreenMenu {
             timeLimit: Number(this.timeInput.value),
         })
         game.unpause();
-        this.parentElement.removeChild(this);
+        game.screenMgr.closeAll();
     }
 
     backButtonPressed() {
-        this.parentElement.appendChild(new ControllerScreen);
-        this.parentElement.removeChild(this);
+        // game.screenMgr.back();
+        // always go back to controller setup cos what if last was gameover?
+        game.screenMgr.back();
     }
 }
 
