@@ -54,6 +54,7 @@ export class DodgeyBall extends Game {
     }
 
     resetMatch() {
+        if (this.matchTimerController) this.matchTimerController.abort();
 
         this.gameObjects = [
             new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0 }),
@@ -72,6 +73,7 @@ export class DodgeyBall extends Game {
         this.countdown = 3;
         // countdown callback! second timer
         animationInterval(1000, this.matchTimerController.signal, time => {
+            if (this.paused) return;
             if (this.countdown < 0) {
                 this.timeLimit--;
             } else if (this.countdown == 1) {
@@ -191,7 +193,7 @@ export class DodgeyBall extends Game {
         this.inplay = false;
         this.matchTimerController.abort();
 
-        this.pause(false);
+        this.timeLimit = Infinity;
 
         let txt = winner == 2 ? `It's a draw!` : `${winner ? 'Cyan' : 'Yellow'} Wins by ${reason == 'score' ? `reaching the score limit of ${this.scoreLimit}` : `running out the clock`}!`;
 

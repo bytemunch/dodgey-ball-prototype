@@ -4,12 +4,18 @@ import { FullscreenMenu } from "./FullscreenMenu.js";
 export class SplashScreen extends FullscreenMenu {
     tempID = 'splash';
 
+    gamepadDirections = {
+        'play': { up: 'clear-data', down: 'clear-data', left: '', right: '' },
+        'clear-data': { up: 'play', down: 'play', left: 'audio-toggle', right: 'audio-toggle' },
+        'audio-toggle': { up: 'play', down: 'play', left: 'clear-data', right: 'clear-data' },
+    }
+
     connectedCallback() {
         super.connectedCallback();
 
         // Add interactivity
-        this.shadowRoot.querySelector('#play').addEventListener('click',()=>this.playClicked());
-        this.shadowRoot.querySelector('#clear-data').addEventListener('click',()=>this.clearDataClicked());
+        this.shadowRoot.querySelector('#play').addEventListener('click', () => this.playClicked());
+        this.shadowRoot.querySelector('#clear-data').addEventListener('click', () => this.clearDataClicked());
     }
 
     playClicked() {

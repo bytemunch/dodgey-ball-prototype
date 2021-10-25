@@ -4,6 +4,13 @@ import { FullscreenMenu } from "./FullscreenMenu.js";
 export class ControllerScreen extends FullscreenMenu {
     tempID = 'controller';
 
+    gamepadDirections = {
+        'controller-1': {up: 'back', down: 'done', left: 'controller-2', right: 'controller-2'},
+        'controller-2': {up: 'back', down: 'done', left: 'controller-1', right: 'controller-1'},
+        'back': {up: 'done', down: 'controller-1', left: '', right: ''},
+        'done': {up: 'controller-1', down: 'back', left: '', right: ''},
+    }
+
     connectedCallback() {
         super.connectedCallback();
 

@@ -5,6 +5,8 @@ export class AudioToggle extends CustomElement {
     constructor() {
         super();
         this.addEventListener('click', () => this.click());
+
+        this.setAttribute('tabindex', '0');
     }
 
     click() {

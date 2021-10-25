@@ -17,11 +17,26 @@ export class ScreenManager {
 
     currentPage: string;
 
+    get currentScreenElement() {
+        return this.screens[this.currentPage];
+    }
     constructor() {
         window.addEventListener('hashchange', e => {
             e.preventDefault();
-            this.openScreen(location.hash.replace('#', ''));
-        })
+
+            let newHash = location.hash.replace('#', '');
+
+            if (this.currentPage == 'gameover') { newHash = 'setup' }
+            if (this.currentPage == 'play' && newHash != 'gameover') { newHash = 'pause'; game.pause() }
+            if (this.currentPage == 'setup' && newHash == 'pause') { newHash = 'controller'; }
+
+            // Eliminates doubled entries in history caused by this messing about
+            if (this.currentPage == newHash) history.back();
+
+            history.replaceState(null, 'unused', '#' + newHash)
+
+            this.openScreen(newHash);
+        });
     }
 
     init() {
@@ -30,7 +45,8 @@ export class ScreenManager {
         }
         this.closeAll();
 
-        this.openScreen(location.hash.replace('#',''));
+        location.hash = 'splash';
+        this.openScreen('splash');
     }
 
     gameOver(txt) {
@@ -44,11 +60,12 @@ export class ScreenManager {
 
     private openScreen(screenID) {
         this.closeAll();
-        this.screens[screenID].show();
         this.currentPage = screenID;
+        if (screenID == 'play') return;
+        this.screens[screenID].show();
     }
 
-    closeAll() {
+    private closeAll() {
         // close all screens
         for (let s in this.screens) {
             this.screens[s].hide();
@@ -57,7 +74,7 @@ export class ScreenManager {
 
     back() {
         let prev;
-        // Splash -> Controller -> Setup -> Gameplay -> GameOver
+
         switch (this.currentPage) {
             case 'splash':
                 console.log('back to where?');
@@ -72,11 +89,13 @@ export class ScreenManager {
             case 'gameover':
                 prev = 'setup';
                 break;
+            case 'play':
+                game.pause();
+                break;
             default:
                 prev = 'splash'
         }
 
-        //TODO may cause history loop?
-        this.open(prev);
+        if (prev) this.open(prev);
     }
 }

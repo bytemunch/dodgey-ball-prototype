@@ -24,12 +24,17 @@
 }
 
 button,
-ce-audio-toggle {
-    border: 3px white solid;
+ce-audio-toggle,
+input {
+    border: 6px white solid;
 }
 
 button:active {
-    border: 3px gold solid;
+    border: 6px rgba(69, 69, 69, 0.8) solid;
+}
+
+*:focus {
+    border: 6px gold solid;
 }
 
 .big {

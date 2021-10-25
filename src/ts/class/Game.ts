@@ -1,4 +1,3 @@
-import { SplashScreen } from "../elements/SplashScreen.js";
 import { AudioManager } from "./AudioManager.js";
 import { Camera } from "./Camera.js";
 import { CameraXY } from "./CameraXY.js";
@@ -49,6 +48,8 @@ export class Game {
 
     gameObjects: GameObject[];
     uiObjects: UIObject[];
+
+    paused: boolean = true;
 
     constructor() {
         // Grab DOM
@@ -185,31 +186,21 @@ export class Game {
         this.unpause();
     }
 
-    // PAUSING
-    pause(showMenu: boolean = true) {
+    pause() {
         this.audioMgr.play('click');
 
-        // Decrease timestep to 0
-        const decreaseTimeFactor = () => {
-            this.timeFactor = 0;
-        }
+        this.paused = true;
 
-        decreaseTimeFactor();
+        this.timeFactor = 0;
 
-        // TODO show menu
-        if (showMenu) { }
     }
 
     unpause() {
         this.audioMgr.play('click');
 
-        // TODO hide menu
+        this.timeFactor = 1;
 
-        // increase timestep to 1
-        const increaseTimeFactor = () => {
-            this.timeFactor = 1;
-        }
-        increaseTimeFactor();
+        this.paused = false;
     }
 
     async advert() {
@@ -241,6 +232,8 @@ export class Game {
         return [...this.gameObjects, ...this.uiObjects]
     }
 
+    controllerDebounce = 0;
+
     async loop(t: DOMHighResTimeStamp) {
         // timings
         this.framecount++;
@@ -252,6 +245,18 @@ export class Game {
 
         // Gamepad Input
         this.gamepadMgr.refreshStates();
+
+        if (this.gamepadMgr.gamepads[0]) {
+            if (this.controllerDebounce <= 0) {
+                if (this.gamepadMgr.gamepads[0].buttons[12].pressed) { this.screenMgr.currentScreenElement.gamepadMove('up'); this.controllerDebounce = 10; }
+                if (this.gamepadMgr.gamepads[0].buttons[13].pressed) { this.screenMgr.currentScreenElement.gamepadMove('down'); this.controllerDebounce = 10; }
+                if (this.gamepadMgr.gamepads[0].buttons[14].pressed) { this.screenMgr.currentScreenElement.gamepadMove('left'); this.controllerDebounce = 10; }
+                if (this.gamepadMgr.gamepads[0].buttons[15].pressed) { this.screenMgr.currentScreenElement.gamepadMove('right'); this.controllerDebounce = 10; }
+                if (this.gamepadMgr.gamepads[0].buttons[0].pressed) { (<HTMLInputElement>this.screenMgr.currentScreenElement.shadowRoot.activeElement).click(); this.controllerDebounce = 10; }
+            } else {
+                this.controllerDebounce--;
+            }
+        }
 
         // Removal
         for (let i = this.gameObjects.length - 1; i > 0; i--) {

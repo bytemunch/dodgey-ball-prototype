@@ -4,6 +4,8 @@ import { FullscreenMenu } from "./FullscreenMenu.js";
 export class GameOverScreen extends FullscreenMenu {
     tempID = 'gameover';
 
+    gamepadDirections = { 'continue': {} }
+
     constructor() {
         super();
     }

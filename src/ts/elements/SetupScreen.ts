@@ -4,6 +4,17 @@ import { FullscreenMenu } from "./FullscreenMenu.js";
 export class SetupScreen extends FullscreenMenu {
     tempID = 'setup';
 
+    gamepadDirections = {
+        'back': {up:'play',down:'setup-score-lower',left:'setup-score-higher',right:'setup-score-lower'},
+        'setup-score-lower': {up:'back',down:'setup-time-lower',left:'setup-score-higher',right:'setup-input-score'},
+        'setup-input-score': {up:'back',down:'setup-input-time',left:'setup-score-lower',right:'setup-score-higher'},
+        'setup-score-higher': {up:'back',down:'setup-time-higher',left:'setup-input-score',right:'setup-score-lower'},
+        'setup-time-lower': {up:'setup-score-lower',down:'play',left:'setup-time-higher',right:'setup-input-time'},
+        'setup-input-time': {up:'setup-input-score',down:'play',left:'setup-time-lower',right:'setup-time-higher'},
+        'setup-time-higher': {up:'setup-score-higher',down:'play',left:'setup-input-time',right:'setup-time-lower'},
+        'play': {up:'setup-input-time',down:'back',left:'',right:''},
+    }
+
     connectedCallback() {
         super.connectedCallback();
 
@@ -40,12 +51,10 @@ export class SetupScreen extends FullscreenMenu {
             timeLimit: Number(this.timeInput.value),
         })
         game.unpause();
-        game.screenMgr.closeAll();
+        game.screenMgr.open('play');
     }
 
     backButtonPressed() {
-        // game.screenMgr.back();
-        // always go back to controller setup cos what if last was gameover?
         game.screenMgr.back();
     }
 }
