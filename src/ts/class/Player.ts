@@ -42,7 +42,7 @@ export class Player extends GameObject {
     }
 
     get controller() {
-        return game.gamepadMgr.gamepads[this.team];
+        return game.iAT.players[this.team];
     }
 
     hit(s: Sphere) {
@@ -53,50 +53,24 @@ export class Player extends GameObject {
     }
 
     update() {
-        // leggooooo
-
         // set target velocity
         if (this.controller && game.inplay) {
-            // movement
-            let direction = vec3.fromValues(this.controller.axes[0], 0, -this.controller.axes[1]);
-            this.applyForce(direction);
+            this.applyForce(this.controller.direction);
 
-            // targeting
-            this.target = vec3.fromValues(
-                this.controller.axes[2] > 0.1 ? this.controller.axes[2] : this.controller.axes[2] < -0.1 ? this.controller.axes[2] : 0,
-                0,
-                this.controller.axes[3] > 0.1 ? this.controller.axes[3] : this.controller.axes[3] < -0.1 ? this.controller.axes[3] : 0
-            )
-
-            this.target[2] *= -1;
-
-            if (vec3.equals(this.target, [0, 0, 0])) this.target = vec3.clone(direction);
-
-            vec3.normalize(this.target, this.target);
-
-            vec3.scale(this.target, this.target, 50);
+            this.target = vec3.clone(this.controller.target);
 
             const tv1 = vec3.add([], [this.center[0], this.center[1], this.z], [0, this.height / 2, 0])
 
             this.tp.pos = tv1;
             this.tp.pos2 = vec3.add([], tv1, this.target);
 
-            this.maxSpeed = this.controller.buttons[4].pressed ? 7 : 5;
+            this.maxSpeed = game.iAT.players[this.team].sprint ? 7 : 5;
 
-            // shoota
-            if (this.controller.buttons[5].pressed) this.shoot(false);
-
-            this.controllerDebounce--;
-
-            if (this.controller.buttons[6].pressed || this.controller.buttons[7].pressed) {
-                if (this.controllerDebounce <= 0) {
-                    this.controllerDebounce = 20;
-
-                    if (this.hasBall) {
-                        this.shoot(true);
-                    } else {
-                        this.pickupBall();
-                    }
+            if (this.controller.shoot || this.controller.pickup) {
+                if (this.hasBall) {
+                    this.shoot(true);
+                } else {
+                    this.pickupBall();
                 }
             }
 

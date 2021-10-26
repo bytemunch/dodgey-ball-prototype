@@ -3,6 +3,7 @@ import { Camera } from "./Camera.js";
 import { CameraXY } from "./CameraXY.js";
 import { GameObject } from "./GameObject.js";
 import { GamepadManager } from "./GamepadManager.js";
+import { InputActionTranslator } from "./InputActionTranslator.js";
 import { MouseTouchManager } from "./MouseTouchManager.js";
 import { ScreenManager } from "./ScreenManager.js";
 import { UIObject } from "./UIObject.js";
@@ -43,6 +44,9 @@ export class Game {
     gamepadMgr: GamepadManager;
     screenMgr: ScreenManager;
 
+    // Input
+    iAT: InputActionTranslator;
+
     // Game stuff
     playfield: { x: number, y: number, z: number, width: number, height: number, depth: number, floor: number };
 
@@ -71,6 +75,7 @@ export class Game {
         this.mouseTouchMgr = new MouseTouchManager(this.touchTarget);
         this.gamepadMgr = new GamepadManager;
         this.screenMgr = new ScreenManager;
+        this.iAT = new InputActionTranslator(2);
 
         // Add listeners
         // resize canvas on window resize
@@ -243,9 +248,9 @@ export class Game {
 
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
-        // Gamepad Input
-        this.gamepadMgr.refreshStates();
+        this.iAT.update(t);
 
+        // Gamepad Menu Input
         if (this.gamepadMgr.gamepads[0]) {
             if (this.controllerDebounce <= 0) {
                 if (this.gamepadMgr.gamepads[0].buttons[12].pressed) { this.screenMgr.currentScreenElement.gamepadMove('up'); this.controllerDebounce = 10; }
