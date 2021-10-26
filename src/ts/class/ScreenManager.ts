@@ -30,9 +30,6 @@ export class ScreenManager {
             if (this.currentPage == 'play' && newHash != 'gameover') { newHash = 'pause'; game.pause() }
             if (this.currentPage == 'setup' && newHash == 'pause') { newHash = 'controller'; }
 
-            // Eliminates doubled entries in history caused by this messing about
-            if (this.currentPage == newHash) history.back();
-
             history.replaceState(null, 'unused', '#' + newHash)
 
             this.openScreen(newHash);
