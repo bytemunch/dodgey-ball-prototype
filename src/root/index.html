@@ -44,17 +44,8 @@
             left: 0;
         }
         
-        #main-game #topdown-canvas {
-            bottom: -55%;
-            top: unset;
-            border: 1px solid red;
-        }
-        
-        #main-game #xy-canvas {
-            bottom: -55%;
-            top: unset;
-            left: 50%;
-            border: 1px solid red;
+        .fs-menu {
+            z-index: 600;
         }
         
         .fullscreen {
@@ -65,76 +56,14 @@
             height: 100%;
             display: none;
             z-index: 600;
-            backdrop-filter: blur(5px);
-            background: rgba(69, 69, 69, 0.4);
             color: white;
             padding: 10%;
-        }
-        
-        .fullscreen * {
-            text-align: center;
-            font-size: larger;
-            display: block;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
         }
         
         #touch-target {
             z-index: 500;
             backdrop-filter: none;
             background: none;
-        }
-        
-        .fs-btn-1 {
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 70%;
-            min-height: 7%;
-            background-color: green;
-        }
-        
-        .fs-btn-2 {
-            top: 75%;
-            min-height: 5%;
-            width: 50%;
-            background-color: red;
-        }
-        
-        .fs-btn-3 {
-            top: 85%;
-            min-height: 5%;
-            width: 50%;
-            background-color: red;
-        }
-        
-        .audio-toggle {
-            background-color: green;
-            background-image: url('img/audio.png');
-            background-size: contain;
-            width: 48px;
-            height: 48px;
-            position: absolute;
-            top: 85%;
-            left: 85%;
-        }
-        
-        .audio-toggle.disabled {
-            background-color: red;
-            background-image: url('img/no-audio.png');
-        }
-        
-        #advert p {
-            text-align: left;
-            font-size: large;
-        }
-        
-        #setup-match * {
-            position: relative;
-        }
-        
-        #gameover * {
-            position: relative;
         }
     </style>
 </head>
