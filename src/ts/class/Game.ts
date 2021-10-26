@@ -4,7 +4,6 @@ import { CameraXY } from "./CameraXY.js";
 import { GameObject } from "./GameObject.js";
 import { GamepadManager } from "./GamepadManager.js";
 import { InputActionTranslator } from "./InputActionTranslator.js";
-import { MouseTouchManager } from "./MouseTouchManager.js";
 import { ScreenManager } from "./ScreenManager.js";
 import { UIObject } from "./UIObject.js";
 
@@ -40,7 +39,6 @@ export class Game {
     loopHandle;
 
     audioMgr: AudioManager;
-    mouseTouchMgr: MouseTouchManager;
     gamepadMgr: GamepadManager;
     screenMgr: ScreenManager;
 
@@ -72,7 +70,6 @@ export class Game {
         this.uiObjects = [];
 
         this.audioMgr = new AudioManager;
-        this.mouseTouchMgr = new MouseTouchManager(this.touchTarget);
         this.gamepadMgr = new GamepadManager;
         this.screenMgr = new ScreenManager;
         this.iAT = new InputActionTranslator(2);

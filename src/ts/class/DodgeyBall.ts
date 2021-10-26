@@ -8,6 +8,7 @@ import { Player } from "./Player.js";
 import { Scoreboard } from "./Scoreboard.js";
 import { Sphere } from "./Sphere.js";
 import { Timer } from "./Timer.js";
+import { TouchController } from "./TouchController.js";
 
 export class DodgeyBall extends Game {
     gravity: vec3 = vec3.fromValues(0, 0.8, 0);
@@ -30,6 +31,8 @@ export class DodgeyBall extends Game {
 
     matchTimerController: AbortController;
 
+    touchController: TouchController;
+
     constructor() {
         super();
 
@@ -44,7 +47,15 @@ export class DodgeyBall extends Game {
         }
     }
 
-    // Buttons!
+    postInit() {
+        super.postInit();
+        this.touchController = new TouchController;
+    }
+
+    onResize() {
+        super.onResize();
+    }
+
     setupGame(gameOptions: { scoreLimit: number, timeLimit: number }) {
         this.scoreLimit = gameOptions.scoreLimit;
         this.timeLimit = gameOptions.timeLimit;

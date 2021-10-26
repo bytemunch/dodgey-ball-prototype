@@ -1,0 +1,10 @@
+:host {
+    display: block;
+    background-color: green;
+    width: 10%;
+    height: 10%;
+}
+
+:host(.toggle) {
+    background-color: red;
+}

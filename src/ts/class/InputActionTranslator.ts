@@ -15,12 +15,10 @@ export class InputActionTranslator {
                 shoot: false,
                 pickup: false,
                 sprint: false,
-                controller: 'keyboard-0',
+                controller: 'touch-0',
                 debounceCounter: 0
             });
         }
-
-        // Add key listeners
 
         window.addEventListener('keydown', e => {
             if (!this.kbUsedKeys.includes(e.key.toUpperCase())) return;
@@ -53,6 +51,9 @@ export class InputActionTranslator {
                     break;
                 case 'keyboard':
                     this.translateKeyboard(playerID, id);
+                    break;
+                case 'touch':
+                    this.translateTouch(playerID, id);
                     break;
             }
         }
@@ -139,6 +140,35 @@ export class InputActionTranslator {
         }
     }
 
+    translateTouch(playerID, id) {
+        const touchcontroller = game.touchController;
+
+        this.players[playerID].direction = vec3.fromValues(touchcontroller.axes[0], 0, -touchcontroller.axes[1]);
+        this.players[playerID].target = vec3.fromValues(
+            touchcontroller.axes[2] > 0.1 ? touchcontroller.axes[2] : touchcontroller.axes[2] < -0.1 ? touchcontroller.axes[2] : 0,
+            0,
+            touchcontroller.axes[3] > 0.1 ? touchcontroller.axes[3] : touchcontroller.axes[3] < -0.1 ? touchcontroller.axes[3] : 0
+        )
+
+        this.players[playerID].target[2] *= -1;
+
+        // Copy targeting from movement vector
+        if (vec3.equals(this.players[playerID].target, [0, 0, 0])) this.players[playerID].target = vec3.clone(this.players[playerID].direction);
+
+        vec3.normalize(this.players[playerID].target, this.players[playerID].target);
+
+        vec3.scale(this.players[playerID].target, this.players[playerID].target, 50);
+
+        this.players[playerID].sprint = touchcontroller.sprint;
+
+        if (touchcontroller.action) {
+            if (this.players[playerID].debounceCounter <= 0) {
+                this.players[playerID].debounceCounter = 20;
+                this.players[playerID].shoot = true;
+                this.players[playerID].pickup = true;
+            }
+        }
+    }
 }
 
 interface PlayerControls {
