@@ -71,7 +71,6 @@ export class Game {
 
         this.audioMgr = new AudioManager;
         this.gamepadMgr = new GamepadManager;
-        this.screenMgr = new ScreenManager;
         this.iAT = new InputActionTranslator(2);
 
         // Add listeners
@@ -92,6 +91,7 @@ export class Game {
         // setup initial canvas sizes
         this.onResize();
 
+        this.screenMgr = new ScreenManager;
         this.screenMgr.init();
 
         // begin main loop

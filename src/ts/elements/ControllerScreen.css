@@ -21,13 +21,14 @@
     background-image: url(../img/controller.png);
 }
 
-#controller-setup .controller-button.touch {
+
+/* #controller-setup .controller-button.touch {
     background-image: url(../img/touch.png);
 }
 
 #controller-setup .controller-button.kbm {
     background-image: url(../img/kbm.png);
-}
+} */
 
 #controller-setup #controller-1 {
     grid-column: 2;

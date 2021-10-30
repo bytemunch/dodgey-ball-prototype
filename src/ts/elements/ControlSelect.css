@@ -1,0 +1,26 @@
+:host {
+    background-color: grey;
+}
+
+#player-number {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    text-align: center;
+}
+
+#controller-id {
+    position: absolute;
+    top: 10%;
+    width: 100%;
+    text-align: center;
+}
+
+#controller-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 25%;
+    text-align: center;
+}
