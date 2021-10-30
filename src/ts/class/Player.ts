@@ -66,13 +66,13 @@ export class Player extends GameObject {
 
             this.maxSpeed = game.iAT.players[this.team].sprint ? 7 : 5;
 
-            if (this.controller.shoot || this.controller.pickup) {
+            if (this.controller.shoot) {
                 if (this.hasBall) {
                     this.shoot(true);
-                } else {
-                    this.pickupBall();
                 }
             }
+
+            if (this.controller.pickup) this.pickupBall();
 
             this.iframes > 0 ? this.iframes-- : this.iframes = 0;
         }

@@ -12,6 +12,7 @@ export class InputActionTranslator {
             this.players.push({
                 direction: vec3.create(),
                 target: vec3.create(),
+                lastTarget: vec3.create(),
                 shoot: false,
                 pickup: false,
                 sprint: false,
@@ -60,12 +61,16 @@ export class InputActionTranslator {
     }
 
     reset(playerID) {
+        if (this.players[playerID].shoot) {
+            Object.assign(this.players[playerID], { target: vec3.create(), lastTarget: vec3.create() });
+        }
+
         Object.assign(this.players[playerID], {
             direction: vec3.create(),
-            // target: vec3.create(), // not resetting target to allow for maintained state over time
             shoot: false,
             pickup: false,
             sprint: false,
+            lastTarget: vec3.clone(this.players[playerID].target),
         });
     }
 
@@ -153,11 +158,7 @@ export class InputActionTranslator {
         this.players[playerID].target[2] *= -1;
 
         // Copy targeting from movement vector
-        if (vec3.equals(this.players[playerID].target, [0, 0, 0])) this.players[playerID].target = vec3.clone(this.players[playerID].direction);
-
-        vec3.normalize(this.players[playerID].target, this.players[playerID].target);
-
-        vec3.scale(this.players[playerID].target, this.players[playerID].target, 50);
+        // if (vec3.equals(this.players[playerID].target, [0, 0, 0])) this.players[playerID].target = vec3.clone(this.players[playerID].direction);
 
         this.players[playerID].sprint = touchcontroller.sprint;
 
@@ -168,12 +169,23 @@ export class InputActionTranslator {
                 this.players[playerID].pickup = true;
             }
         }
+
+        // Fire on release of aim
+        if (vec3.equals(this.players[playerID].target, [0, 0, 0]) && !vec3.equals(this.players[playerID].lastTarget, [0, 0, 0])) {
+            this.players[playerID].target = vec3.clone(this.players[playerID].lastTarget);
+            this.players[playerID].shoot = true;
+            vec3.zero(this.players[playerID].lastTarget);
+        }
+
+        vec3.normalize(this.players[playerID].target, this.players[playerID].target);
+        vec3.scale(this.players[playerID].target, this.players[playerID].target, 50);
     }
 }
 
 interface PlayerControls {
     direction: vec3,
     target: vec3,
+    lastTarget: vec3,
     shoot: boolean,
     pickup: boolean,
     sprint: boolean,
