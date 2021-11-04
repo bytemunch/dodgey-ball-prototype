@@ -1,3 +1,4 @@
+import { ControllerScreen } from "../elements/ControllerScreen.js";
 import { vec3 } from "../lib/gl-matrix/index.js";
 import { animationInterval } from "../lib/timer/1.js";
 import { Ballswap } from "./Ballswap.js";
@@ -68,8 +69,8 @@ export class DodgeyBall extends Game {
         if (this.matchTimerController) this.matchTimerController.abort();
 
         this.gameObjects = [
-            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0 }),
-            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: -30, team: 1 }),
+            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0}),
+            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: -30, team: 1}),
             new Sphere({ x: 0, y: 0, z: 0, r: this.ballSize }),
             new Sphere({ x: 0, y: 0, z: 100, r: this.ballSize }),
             new Sphere({ x: 0, y: 0, z: -100, r: this.ballSize }),
@@ -175,6 +176,7 @@ export class DodgeyBall extends Game {
     }
 
     addUi() {
+        (<HTMLElement>document.querySelector('#touch-target')).style.display = this.iAT.usingTouch ? 'block' : 'none';
         this.uiObjects.push(new Scoreboard({ pos: [this.playfield.x + 48, this.playfield.y - 64], team: 0 }));
         this.uiObjects.push(new Scoreboard({ pos: [-1 * (this.playfield.x) - 48 * 2, this.playfield.y - 64], team: 1 }));
         this.uiObjects.push(new Timer({ pos: [(this.playfield.x + this.playfield.width / 2) - 48 / 2, this.playfield.y - 64] }));

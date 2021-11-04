@@ -1,3 +1,4 @@
+import { ControllerScreen } from "../elements/ControllerScreen.js";
 import { vec3 } from "../lib/gl-matrix/index.js";
 import { game } from "../main.js";
 
@@ -7,8 +8,17 @@ export class InputActionTranslator {
 
     kbUsedKeys = ['W', 'A', 'S', 'D', 'F', 'SHIFT', 'Q', 'E', '2', '4', '6', '8', '1', '3', '5', '7', '9'];
 
+    get usingTouch() {
+        let touch = false;
+        for (let p of this.players) {
+            if (p.controller.includes('touch')) touch = true;
+        }
+        return touch;
+    }
+
     constructor(playerCount = 2) {
         for (let i = 0; i < playerCount; i++) {
+
             this.players.push({
                 direction: vec3.create(),
                 target: vec3.create(),
@@ -16,7 +26,7 @@ export class InputActionTranslator {
                 shoot: false,
                 pickup: false,
                 sprint: false,
-                controller: 'touch-0',
+                controller: (<ControllerScreen>game.screenMgr.screens.controller)[`controller${i + 1}`].selectedInput,
                 debounceCounter: 0
             });
         }
@@ -56,6 +66,8 @@ export class InputActionTranslator {
                 case 'touch':
                     this.translateTouch(playerID, id);
                     break;
+                case 'default':
+                    console.log('no controller for ' + playerID);
             }
         }
     }
@@ -71,6 +83,7 @@ export class InputActionTranslator {
             pickup: false,
             sprint: false,
             lastTarget: vec3.clone(this.players[playerID].target),
+            controller: (<ControllerScreen>game.screenMgr.screens.controller)[`controller${playerID + 1}`].selectedInput,
         });
     }
 

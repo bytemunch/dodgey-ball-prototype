@@ -71,7 +71,6 @@ export class Game {
 
         this.audioMgr = new AudioManager;
         this.gamepadMgr = new GamepadManager;
-        this.iAT = new InputActionTranslator(2);
 
         // Add listeners
         // resize canvas on window resize
@@ -93,6 +92,8 @@ export class Game {
 
         this.screenMgr = new ScreenManager;
         this.screenMgr.init();
+
+        this.iAT = new InputActionTranslator(2);
 
         // begin main loop
         this.loopHandle = requestAnimationFrame(this.loop.bind(this));

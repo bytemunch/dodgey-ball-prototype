@@ -17,6 +17,10 @@ export class ControlSelect extends CustomElement {
     controllerIDp: HTMLParagraphElement;
     controllerImg: HTMLImageElement;
 
+    get selectedInput() {
+        return this.availableInputDevices[this.currentlySelected];
+    }
+
     constructor(forPlayer) {
         super();
         this.forPlayer = forPlayer;
