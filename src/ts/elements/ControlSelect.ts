@@ -17,7 +17,7 @@ export class ControlSelect extends CustomElement {
     controllerIDp: HTMLParagraphElement;
     controllerImg: HTMLImageElement;
 
-    get selectedInput() {
+    get selectedInput():InputOption {
         return this.availableInputDevices[this.currentlySelected];
     }
 
@@ -26,7 +26,7 @@ export class ControlSelect extends CustomElement {
         this.forPlayer = forPlayer;
 
         this.playerIDp = document.createElement('p');
-        this.playerIDp.textContent = 'Player ' + (forPlayer+1);
+        this.playerIDp.textContent = 'Player ' + (forPlayer + 1);
         this.shadowRoot.appendChild(this.playerIDp);
 
 
@@ -42,13 +42,19 @@ export class ControlSelect extends CustomElement {
         this.addEventListener('click', () => this.click())
     }
 
-    get availableInputDevices() {
-        let inputs = ['block'];
-        inputs.push(isTouchDevice() ? 'touch' : 'keyboard');
+    get availableInputDevices(): InputOption[] {
+        let noInput: InputOption = { type: 'none', displayName: 'None', id: 0, img: 'block.png' };
+        let touchInput: InputOption = { type: 'touch', displayName: 'Touchscreen', id: 0, img: 'touch.png' };
+        let kbInput: InputOption = { type: 'keyboard', displayName: 'Keyboard', id: 0, img: 'keyboard.png' };
+        let inputs = [noInput];
+        inputs.push(isTouchDevice() ? touchInput : kbInput);
         // DEBUG
-        inputs.push(isTouchDevice() ? 'keyboard' : 'touch');
+        inputs.push(isTouchDevice() ? kbInput : touchInput);
         for (let pad in game.gamepadMgr.gamepads) {
-            if (pad != 'item' && pad != 'length' && game.gamepadMgr.gamepads[pad] != null) inputs.push('gamepad-' + pad);
+            if (pad != 'item' && pad != 'length' && game.gamepadMgr.gamepads[pad] != null) {
+                const padInput: InputOption = { type: 'gamepad', displayName: game.gamepadMgr.gamepads[pad].id, id: Number(pad), img: 'gamepad.png' }
+                inputs.push(padInput);
+            }
         }
         return inputs;
     }
@@ -61,9 +67,16 @@ export class ControlSelect extends CustomElement {
 
     update() {
         this.currentlySelected ? this.classList.add('green') : this.classList.remove('green');
-        this.controllerIDp.textContent = this.availableInputDevices[this.currentlySelected];
-        this.controllerImg.src = `img/${this.availableInputDevices[this.currentlySelected].split('-')[0]}.png`;
+        this.controllerIDp.textContent = this.availableInputDevices[this.currentlySelected].displayName;
+        this.controllerImg.src = `img/${this.availableInputDevices[this.currentlySelected].img}`;
     }
+}
+
+export type InputOption = {
+    type: string,
+    id: number,
+    img: string,
+    displayName: string
 }
 
 customElements.define('control-select', ControlSelect);

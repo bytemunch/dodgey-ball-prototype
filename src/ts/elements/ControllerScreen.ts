@@ -5,8 +5,8 @@ import { FullscreenMenu } from "./FullscreenMenu.js";
 export class ControllerScreen extends FullscreenMenu {
     tempID = 'controller';
 
-    controller1:ControlSelect;
-    controller2:ControlSelect;
+    controller1: ControlSelect;
+    controller2: ControlSelect;
 
     gamepadDirections = {
         'controller-1': { up: 'back', down: 'done', left: 'controller-2', right: 'controller-2' },
@@ -32,6 +32,41 @@ export class ControllerScreen extends FullscreenMenu {
 
         this.shadowRoot.querySelector('#done').addEventListener('click', () => this.doneButtonPressed())
         this.shadowRoot.querySelector('#back').addEventListener('click', () => this.backButtonPressed())
+    }
+
+    testButtonPressed(gamepad) {
+        console.log('test button!', gamepad);
+        if (gamepad == this.controller1.selectedInput.id && this.controller1.selectedInput.type == 'gamepad') {
+            this.controller1.classList.add('shake');
+
+            //@ts-ignore non-spec vibration shizz
+            game.gamepadMgr.gamepads[gamepad].vibrationActuator.playEffect("dual-rumble", {
+                startDelay: 0,
+                duration: 600,
+                weakMagnitude: 1,
+                strongMagnitude: 1
+            })
+
+            setTimeout(() => {
+                this.controller1.classList.remove('shake');
+            }, 1000);
+        }
+
+        if (gamepad == this.controller2.selectedInput.id && this.controller2.selectedInput.type == 'gamepad') {
+            this.controller2.classList.add('shake');
+
+            //@ts-ignore non-spec vibration shizz
+            // Thankyou https://gamepad-tester.com/for-developers
+            game.gamepadMgr.gamepads[gamepad].vibrationActuator.playEffect("dual-rumble", {
+                startDelay: 0,
+                duration: 600,
+                weakMagnitude: 1,
+                strongMagnitude: 1
+            })
+            setTimeout(() => {
+                this.controller2.classList.remove('shake');
+            }, 1000);
+        }
     }
 
     doneButtonPressed() {

@@ -28,6 +28,10 @@ Google
 https://fonts.google.com/icons?selected=Material+Icons+Outlined
 
 
-### Joysticks
+### Touch Joysticks
 /u/AndrewGreenh
 https://www.reddit.com/user/AndrewGreenh
+
+### Gamepad Vibration
+https://gamepad-tester.com/for-developers
+

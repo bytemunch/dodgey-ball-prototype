@@ -15,6 +15,7 @@
     background-repeat: no-repeat;
     font-size: 1.5em;
     padding-top: 50%;
+    position: relative;
 }
 
 #controller-setup .controller-button.gamepad {
@@ -48,4 +49,31 @@
 #controller-setup #back {
     grid-column: 1/3;
     grid-row: 1;
+}
+
+.shake {
+    animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+    transform: translate3d(-50%, -50%, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+@keyframes shake {
+    10%,
+    90% {
+        transform: translate3d(calc(-50% + -1px), -50%, 0);
+    }
+    20%,
+    80% {
+        transform: translate3d(calc(-50% + 2px), -50%, 0);
+    }
+    30%,
+    50%,
+    70% {
+        transform: translate3d(calc(-50% + -4px), -50%, 0);
+    }
+    40%,
+    60% {
+        transform: translate3d(calc(-50% + 4px), -50%, 0);
+    }
 }

@@ -68,6 +68,7 @@ export class DodgeyBall extends Game {
     resetMatch() {
         if (this.matchTimerController) this.matchTimerController.abort();
 
+        // TODO check how many players from control select screen
         this.gameObjects = [
             new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0}),
             new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: -30, team: 1}),
