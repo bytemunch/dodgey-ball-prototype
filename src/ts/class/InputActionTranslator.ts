@@ -1,5 +1,5 @@
 import { ControllerScreen } from "../elements/ControllerScreen.js";
-import { ControlSelect, InputOption } from "../elements/ControlSelect.js";
+import { ControlSelect } from "../elements/ControlSelect.js";
 import { vec3 } from "../lib/gl-matrix/index.js";
 import { game } from "../main.js";
 
@@ -12,7 +12,7 @@ export class InputActionTranslator {
     get usingTouch() {
         let touch = false;
         for (let p of this.players) {
-            if (p.controller.type == 'touch') touch = true;
+            if (p.controller.split('-')[0] == 'touch') touch = true;
         }
         return touch;
     }
@@ -54,8 +54,8 @@ export class InputActionTranslator {
 
             this.players[playerID].debounceCounter--;
             // Get inputs from control scheme
-            const scheme = this.players[playerID].controller.type;
-            const id = this.players[playerID].controller.id;
+            const scheme = this.players[playerID].controller.split('-')[0];
+            const id = this.players[playerID].controller.split('-')[1];
             switch (scheme) {
                 case 'gamepad':
                     this.translateGamepad(playerID, id);
@@ -203,6 +203,6 @@ interface PlayerControls {
     pickup: boolean,
     sprint: boolean,
     remap?: string,
-    controller: InputOption,
+    controller: string,
     debounceCounter: number
 }

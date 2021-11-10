@@ -70,8 +70,8 @@ export class DodgeyBall extends Game {
 
         // TODO check how many players from control select screen
         this.gameObjects = [
-            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0}),
-            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: -30, team: 1}),
+            new Player({ x: this.playfield.x, y: this.playfield.floor - 60, z: -30, team: 0 }),
+            new Player({ x: this.playfield.x + this.playfield.width, y: this.playfield.floor - 60, z: -30, team: 1 }),
             new Sphere({ x: 0, y: 0, z: 0, r: this.ballSize }),
             new Sphere({ x: 0, y: 0, z: 100, r: this.ballSize }),
             new Sphere({ x: 0, y: 0, z: -100, r: this.ballSize }),
@@ -248,7 +248,55 @@ export class DodgeyBall extends Game {
         )
     }
 
+    controllerDebounce = 0;
+
+    gamepadMenuInput() {
+        const debounceTime = 20;
+        // every frame
+        if (this.gamepadMgr.gamepads[0]) {
+            if (this.controllerDebounce <= 0) {
+                if (this.gamepadMgr.gamepads[0].buttons[12].pressed) { this.screenMgr.currentScreenElement.gamepadMove('up'); this.controllerDebounce = debounceTime; }
+                if (this.gamepadMgr.gamepads[0].buttons[13].pressed) { this.screenMgr.currentScreenElement.gamepadMove('down'); this.controllerDebounce = debounceTime; }
+                if (this.gamepadMgr.gamepads[0].buttons[14].pressed) { this.screenMgr.currentScreenElement.gamepadMove('left'); this.controllerDebounce = debounceTime; }
+                if (this.gamepadMgr.gamepads[0].buttons[15].pressed) { this.screenMgr.currentScreenElement.gamepadMove('right'); this.controllerDebounce = debounceTime; }
+                if (this.gamepadMgr.gamepads[0].buttons[0].pressed) { (<HTMLInputElement>this.screenMgr.currentScreenElement.shadowRoot.activeElement)?.click(); this.controllerDebounce = debounceTime; }
+                if (this.gamepadMgr.gamepads[0].buttons[1].pressed) { this.screenMgr.back(); this.controllerDebounce = debounceTime; }
+                if (this.gamepadMgr.gamepads[0].buttons[2].pressed) { (<ControllerScreen>this.screenMgr.currentScreenElement)?.testButtonPressed(0); this.controllerDebounce = debounceTime; }
+            } else {
+                this.controllerDebounce--;
+            }
+        }
+
+        if (this.screenMgr.currentPage == 'controller') {
+            const controllerScreen = (<ControllerScreen>this.screenMgr.currentScreenElement);
+            for (let g of this.gamepadMgr.gamepads) {
+                // if (g.index == 0) continue;
+                if (g.buttons[2].pressed && !controllerScreen.getGamepadConnected(g.index)) {
+                    const nextInput = controllerScreen.getNextAvailableInput();
+                    if (nextInput) {
+                        nextInput.setInput('gamepad-' + g.index);
+                    }
+                }
+                const connectedTo = controllerScreen.getGamepadConnected(g.index);
+                if (g.buttons[3].pressed && connectedTo) {
+                    connectedTo.setInput('none');
+                }
+
+            }
+        }
+
+        if (this.gamepadMgr.gamepads[1]) {
+            if (this.controllerDebounce <= 0) {
+                if (this.gamepadMgr.gamepads[1].buttons[2].pressed) { (<ControllerScreen>this.screenMgr.currentScreenElement)?.testButtonPressed(1); this.controllerDebounce = debounceTime; }
+            } else {
+                this.controllerDebounce--;
+            }
+        }
+    }
+
     gameLoop(t) {
+        this.gamepadMenuInput();
+
         // Collision
         for (let s of this.gameObjects.filter(o => o.is == 'sphere')) {
             for (let s2 of this.gameObjects.filter(o => o.is == 'sphere')) {

@@ -6,7 +6,7 @@
 
 
 export class GamepadManager {
-    gamepads: { [idx: number]: Gamepad } = {};
+    gamepads: Gamepad[] = [];
 
     constructor() {
         console.log('Ready for gamepad...');
@@ -26,6 +26,7 @@ export class GamepadManager {
     }
 
     refreshStates() {
-        this.gamepads = navigator.getGamepads();
+        // make spec compliant
+        this.gamepads = [...navigator.getGamepads()].filter(Boolean); // Cheers HTTP203
     }
 }

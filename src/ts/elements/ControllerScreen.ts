@@ -1,6 +1,6 @@
 import { game } from "../main.js";
-import { ControlSelect } from "./ControlSelect.js";
 import { FullscreenMenu } from "./FullscreenMenu.js";
+import { ControlSelect } from "./ControlSelect.js";
 
 export class ControllerScreen extends FullscreenMenu {
     tempID = 'controller';
@@ -9,10 +9,10 @@ export class ControllerScreen extends FullscreenMenu {
     controller2: ControlSelect;
 
     gamepadDirections = {
-        'controller-1': { up: 'back', down: 'done', left: 'controller-2', right: 'controller-2' },
-        'controller-2': { up: 'back', down: 'done', left: 'controller-1', right: 'controller-1' },
-        'back': { up: 'done', down: 'controller-1', left: '', right: '' },
-        'done': { up: 'controller-1', down: 'back', left: '', right: '' },
+        // 'controller-1': { up: 'back', down: 'done', left: 'controller-2', right: 'controller-2' },
+        // 'controller-2': { up: 'back', down: 'done', left: 'controller-1', right: 'controller-1' },
+        'back': { up: 'done', down: 'done', left: '', right: '' },
+        'done': { up: 'back', down: 'back', left: '', right: '' },
     }
 
     constructor() {
@@ -36,7 +36,7 @@ export class ControllerScreen extends FullscreenMenu {
 
     testButtonPressed(gamepad) {
         console.log('test button!', gamepad);
-        if (gamepad == this.controller1.selectedInput.id && this.controller1.selectedInput.type == 'gamepad') {
+        if (gamepad == this.controller1.selectedInputId && this.controller1.selectedInputType == 'gamepad') {
             this.controller1.classList.add('shake');
 
             //@ts-ignore non-spec vibration shizz
@@ -52,7 +52,7 @@ export class ControllerScreen extends FullscreenMenu {
             }, 1000);
         }
 
-        if (gamepad == this.controller2.selectedInput.id && this.controller2.selectedInput.type == 'gamepad') {
+        if (gamepad == this.controller2.selectedInputId && this.controller2.selectedInputType == 'gamepad') {
             this.controller2.classList.add('shake');
 
             //@ts-ignore non-spec vibration shizz
@@ -77,6 +77,22 @@ export class ControllerScreen extends FullscreenMenu {
 
     backButtonPressed() {
         game.screenMgr.back();
+    }
+
+    getNextAvailableInput():ControlSelect {
+        if (this.controller1.selectedInput == 'none') return this.controller1;
+        if (this.controller2.selectedInput == 'none') return this.controller2;
+        // if (this.controller3.selectedInput == 'none') return this.controller3;
+        // if (this.controller4.selectedInput == 'none') return this.controller4;
+        return;
+    }
+
+    getGamepadConnected(gamepadIndex:number) {
+        if (this.controller1.selectedInput == 'gamepad-'+gamepadIndex) return this.controller1;
+        if (this.controller2.selectedInput == 'gamepad-'+gamepadIndex) return this.controller2;
+        // if (this.controller3.selectedInput == 'gamepad-'+gamepadIndex) return this.controller3;
+        // if (this.controller4.selectedInput == 'gamepad-'+gamepadIndex) return this.controller4;
+        return;
     }
 }
 

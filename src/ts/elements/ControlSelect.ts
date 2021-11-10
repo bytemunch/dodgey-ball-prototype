@@ -1,4 +1,3 @@
-import { game } from "../main.js";
 import { CustomElement } from "./CustomElement.js";
 
 // thanks @bolmaster2 https://stackoverflow.com/a/4819886
@@ -10,19 +9,38 @@ function isTouchDevice() {
 }
 
 export class ControlSelect extends CustomElement {
-    currentlySelected: number = 0;
+    selectedInput: string = 'none';
     forPlayer: number;
 
     playerIDp: HTMLParagraphElement;
     controllerIDp: HTMLParagraphElement;
     controllerImg: HTMLImageElement;
 
-    get selectedInput():InputOption {
-        return this.availableInputDevices[this.currentlySelected];
+    get selectedInputId() {
+        return this.selectedInput.split('-')[1] || '0';
+    }
+
+    get selectedInputType() {
+        return this.selectedInput.split('-')[0];
+    }
+
+    get selectedInputImg() {
+        let fileName = this.selectedInputType;
+        switch (this.selectedInputType) {
+            case 'none':
+                fileName = 'block';
+                break;
+            default:
+                //doNothing();
+                break;
+        }
+        return `img/${fileName}.png`;
     }
 
     constructor(forPlayer) {
         super();
+
+        this.setAttribute('tabindex','0');
         this.forPlayer = forPlayer;
 
         this.playerIDp = document.createElement('p');
@@ -42,41 +60,39 @@ export class ControlSelect extends CustomElement {
         this.addEventListener('click', () => this.click())
     }
 
-    get availableInputDevices(): InputOption[] {
-        let noInput: InputOption = { type: 'none', displayName: 'None', id: 0, img: 'block.png' };
-        let touchInput: InputOption = { type: 'touch', displayName: 'Touchscreen', id: 0, img: 'touch.png' };
-        let kbInput: InputOption = { type: 'keyboard', displayName: 'Keyboard', id: 0, img: 'keyboard.png' };
-        let inputs = [noInput];
-        inputs.push(isTouchDevice() ? touchInput : kbInput);
-        // DEBUG
-        inputs.push(isTouchDevice() ? kbInput : touchInput);
-        for (let pad in game.gamepadMgr.gamepads) {
-            if (pad != 'item' && pad != 'length' && game.gamepadMgr.gamepads[pad] != null) {
-                const padInput: InputOption = { type: 'gamepad', displayName: game.gamepadMgr.gamepads[pad].id, id: Number(pad), img: 'gamepad.png' }
-                inputs.push(padInput);
-            }
+    click() {
+        let nextInput = 'keyboard';
+
+        switch (this.selectedInputType) {
+            case 'none':
+                nextInput = 'keyboard';
+                break;
+            case 'keyboard':
+                nextInput = 'touch';
+                break;
+            case 'touch':
+                nextInput = 'none';
+                break;
+            default:
+                break;
         }
-        return inputs;
+        this.setInput(nextInput);
     }
 
-    click() {
-        // Change to next selection in list where selection not taken
-        this.currentlySelected = (this.currentlySelected + 1) % this.availableInputDevices.length;
+    setInput(input) {
+        // input should be string in form type-id
+        //  e.g. gamepad-0
+
+        this.selectedInput = input;
+
         this.update();
     }
 
     update() {
-        this.currentlySelected ? this.classList.add('green') : this.classList.remove('green');
-        this.controllerIDp.textContent = this.availableInputDevices[this.currentlySelected].displayName;
-        this.controllerImg.src = `img/${this.availableInputDevices[this.currentlySelected].img}`;
+        this.selectedInput !== 'none' ? this.classList.add('green') : this.classList.remove('green');
+        this.controllerIDp.textContent = this.selectedInputType;
+        this.controllerImg.src = this.selectedInputImg;
     }
-}
-
-export type InputOption = {
-    type: string,
-    id: number,
-    img: string,
-    displayName: string
 }
 
 customElements.define('control-select', ControlSelect);

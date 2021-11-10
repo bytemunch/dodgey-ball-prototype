@@ -1,3 +1,6 @@
+UX don't send click event on controller A press for ControlSelect elements
+UX ignore A press from controller 1 with regard to player setup when pressing Done or Back on controller setup screen
+
 BUG player flies up when not focused?
     pause on unfocus?
 

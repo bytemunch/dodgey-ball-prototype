@@ -236,8 +236,6 @@ export class Game {
         return [...this.gameObjects, ...this.uiObjects]
     }
 
-    controllerDebounce = 0;
-
     async loop(t: DOMHighResTimeStamp) {
         // timings
         this.framecount++;
@@ -248,29 +246,6 @@ export class Game {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
         this.iAT.update(t);
-
-        // Gamepad Menu Input
-        if (this.gamepadMgr.gamepads[0]) {
-            if (this.controllerDebounce <= 0) {
-                if (this.gamepadMgr.gamepads[0].buttons[12].pressed) { this.screenMgr.currentScreenElement.gamepadMove('up'); this.controllerDebounce = 10; }
-                if (this.gamepadMgr.gamepads[0].buttons[13].pressed) { this.screenMgr.currentScreenElement.gamepadMove('down'); this.controllerDebounce = 10; }
-                if (this.gamepadMgr.gamepads[0].buttons[14].pressed) { this.screenMgr.currentScreenElement.gamepadMove('left'); this.controllerDebounce = 10; }
-                if (this.gamepadMgr.gamepads[0].buttons[15].pressed) { this.screenMgr.currentScreenElement.gamepadMove('right'); this.controllerDebounce = 10; }
-                if (this.gamepadMgr.gamepads[0].buttons[0].pressed) { (<HTMLInputElement>this.screenMgr.currentScreenElement.shadowRoot.activeElement)?.click(); this.controllerDebounce = 10; }
-                if (this.gamepadMgr.gamepads[0].buttons[2].pressed) { (<ControllerScreen>this.screenMgr.currentScreenElement)?.testButtonPressed(0); this.controllerDebounce = 10; }
-            } else {
-                this.controllerDebounce--;
-            }
-        }
-
-        if (this.gamepadMgr.gamepads[1]) {
-            if (this.controllerDebounce <= 0) {
-                if (this.gamepadMgr.gamepads[0].buttons[2].pressed) { (<ControllerScreen>this.screenMgr.currentScreenElement)?.testButtonPressed(1); this.controllerDebounce = 10; }
-            } else {
-                this.controllerDebounce--;
-            }
-        }
-
 
         // Removal
         for (let i = this.gameObjects.length - 1; i > 0; i--) {
