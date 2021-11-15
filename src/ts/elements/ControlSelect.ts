@@ -1,3 +1,4 @@
+import { game } from "../main.js";
 import { CustomElement } from "./CustomElement.js";
 
 // thanks @bolmaster2 https://stackoverflow.com/a/4819886
@@ -15,6 +16,12 @@ export class ControlSelect extends CustomElement {
     playerIDp: HTMLParagraphElement;
     controllerIDp: HTMLParagraphElement;
     controllerImg: HTMLImageElement;
+    characterImg: HTMLImageElement;
+
+    characterNextButton: HTMLButtonElement;
+    characterPrevButton: HTMLButtonElement;
+
+    selectedCharacter: number = 1;
 
     get selectedInputId() {
         return this.selectedInput.split('-')[1] || '0';
@@ -40,22 +47,53 @@ export class ControlSelect extends CustomElement {
     constructor(forPlayer) {
         super();
 
-        this.setAttribute('tabindex','0');
+        this.setAttribute('tabindex', '0');
         this.forPlayer = forPlayer;
+
+        this.selectedCharacter = forPlayer + 1;
 
         this.playerIDp = document.createElement('p');
         this.playerIDp.textContent = 'Player ' + (forPlayer + 1);
+        this.playerIDp.id = 'player-number';
         this.shadowRoot.appendChild(this.playerIDp);
 
 
         this.controllerIDp = document.createElement('p');
         this.controllerIDp.textContent = 'CONTROLLER_ID';
+        this.controllerIDp.id = 'controller-id';
         this.shadowRoot.appendChild(this.controllerIDp);
 
         this.controllerImg = document.createElement('img');
+        this.controllerImg.id = 'controller-image';
         this.shadowRoot.appendChild(this.controllerImg);
 
+        const br = document.createElement('br');
+        this.shadowRoot.appendChild(br);
+
+        this.characterPrevButton = document.createElement('button');
+        this.characterPrevButton.id = 'btn-char-prev';
+        this.shadowRoot.appendChild(this.characterPrevButton);
+
+        this.characterImg = document.createElement('img');
+        this.characterImg.id = 'character-image';
+        this.shadowRoot.appendChild(this.characterImg);
+
+        this.characterNextButton = document.createElement('button');
+        this.characterNextButton.id = 'btn-char-next';
+        this.shadowRoot.appendChild(this.characterNextButton);
+
         this.update();
+
+        //TODO DRY
+        this.characterNextButton.addEventListener('click', e => {
+            e.stopPropagation();
+            this.nextCharacter(1);
+        });
+
+        this.characterPrevButton.addEventListener('click', e => {
+            e.stopPropagation();
+            this.nextCharacter(-1);
+        });
 
         this.addEventListener('click', () => this.click())
     }
@@ -88,10 +126,43 @@ export class ControlSelect extends CustomElement {
         this.update();
     }
 
+    nextCharacter(dir = 1) {
+        const maxChars = 4;
+        let nextChar = this.selectedCharacter + dir;
+        if (nextChar <= 0) nextChar = maxChars;
+        if (nextChar > maxChars) nextChar = 1;
+
+        this.selectedCharacter = nextChar;
+        this.update();
+    }
+
     update() {
-        this.selectedInput !== 'none' ? this.classList.add('green') : this.classList.remove('green');
-        this.controllerIDp.textContent = this.selectedInputType;
+        this.style.backgroundColor = 'grey';
+
+        if (this.selectedInput !== 'none') {
+            // TODO pastel these colours down a LOT
+            // players 0indexed
+            let color = '#F4889A';
+            switch (this.forPlayer) {
+                case 1:
+                    color = '#31BFF3';
+                    break;
+                case 2:
+                    color = '#c6bb71';
+                    break;
+                case 3:
+                    color = '#79D45E';
+                    break;
+            }
+
+            this.style.backgroundColor = color;
+        }
+
+
+
+        this.controllerIDp.textContent = this.selectedInputType == 'gamepad' ? game.gamepadMgr.gamepads[this.selectedInputId].id : this.selectedInputType;
         this.controllerImg.src = this.selectedInputImg;
+        this.characterImg.src = `img/characters/char${this.selectedCharacter}-placeholder.png`;
     }
 }
 

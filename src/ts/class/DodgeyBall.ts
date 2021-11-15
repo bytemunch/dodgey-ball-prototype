@@ -248,29 +248,29 @@ export class DodgeyBall extends Game {
         )
     }
 
-    controllerDebounce = 0;
+    controllerDebounce = [0,0,0,0];
 
     gamepadMenuInput() {
         const debounceTime = 20;
         // every frame
         if (this.gamepadMgr.gamepads[0]) {
-            if (this.controllerDebounce <= 0) {
-                if (this.gamepadMgr.gamepads[0].buttons[12].pressed) { this.screenMgr.currentScreenElement.gamepadMove('up'); this.controllerDebounce = debounceTime; }
-                if (this.gamepadMgr.gamepads[0].buttons[13].pressed) { this.screenMgr.currentScreenElement.gamepadMove('down'); this.controllerDebounce = debounceTime; }
-                if (this.gamepadMgr.gamepads[0].buttons[14].pressed) { this.screenMgr.currentScreenElement.gamepadMove('left'); this.controllerDebounce = debounceTime; }
-                if (this.gamepadMgr.gamepads[0].buttons[15].pressed) { this.screenMgr.currentScreenElement.gamepadMove('right'); this.controllerDebounce = debounceTime; }
-                if (this.gamepadMgr.gamepads[0].buttons[0].pressed) { (<HTMLInputElement>this.screenMgr.currentScreenElement.shadowRoot.activeElement)?.click(); this.controllerDebounce = debounceTime; }
-                if (this.gamepadMgr.gamepads[0].buttons[1].pressed) { this.screenMgr.back(); this.controllerDebounce = debounceTime; }
-                if (this.gamepadMgr.gamepads[0].buttons[2].pressed) { (<ControllerScreen>this.screenMgr.currentScreenElement)?.testButtonPressed(0); this.controllerDebounce = debounceTime; }
+            if (this.controllerDebounce[0] <= 0) {
+                if (this.gamepadMgr.gamepads[0].buttons[12].pressed) { this.screenMgr.currentScreenElement.gamepadMove('up'); this.controllerDebounce[0] = debounceTime; }
+                if (this.gamepadMgr.gamepads[0].buttons[13].pressed) { this.screenMgr.currentScreenElement.gamepadMove('down'); this.controllerDebounce[0] = debounceTime; }
+                if (this.gamepadMgr.gamepads[0].buttons[14].pressed) { this.screenMgr.currentScreenElement.gamepadMove('left'); this.controllerDebounce[0] = debounceTime; }
+                if (this.gamepadMgr.gamepads[0].buttons[15].pressed) { this.screenMgr.currentScreenElement.gamepadMove('right'); this.controllerDebounce[0] = debounceTime; }
+                if (this.gamepadMgr.gamepads[0].buttons[0].pressed) { (<HTMLInputElement>this.screenMgr.currentScreenElement.shadowRoot.activeElement)?.click(); this.controllerDebounce[0] = debounceTime; }
+                if (this.gamepadMgr.gamepads[0].buttons[1].pressed) { this.screenMgr.back(); this.controllerDebounce[0] = debounceTime; }
+                if (this.gamepadMgr.gamepads[0].buttons[2].pressed) { (<ControllerScreen>this.screenMgr.currentScreenElement)?.testButtonPressed(0); this.controllerDebounce[0] = debounceTime; }
             } else {
-                this.controllerDebounce--;
+                this.controllerDebounce[0]--;
             }
         }
 
+        // Controller Setup Input
         if (this.screenMgr.currentPage == 'controller') {
             const controllerScreen = (<ControllerScreen>this.screenMgr.currentScreenElement);
             for (let g of this.gamepadMgr.gamepads) {
-                // if (g.index == 0) continue;
                 if (g.buttons[2].pressed && !controllerScreen.getGamepadConnected(g.index)) {
                     const nextInput = controllerScreen.getNextAvailableInput();
                     if (nextInput) {
@@ -278,18 +278,26 @@ export class DodgeyBall extends Game {
                     }
                 }
                 const connectedTo = controllerScreen.getGamepadConnected(g.index);
-                if (g.buttons[3].pressed && connectedTo) {
-                    connectedTo.setInput('none');
+
+                if (connectedTo) {
+                    if (g.buttons[3].pressed) {
+                        connectedTo.setInput('none');
+                    }
+                    if (this.controllerDebounce[g.index] <= 0) {
+                        if (g.buttons[14].pressed) {
+                            connectedTo.nextCharacter(-1);
+                            this.controllerDebounce[g.index] = debounceTime;
+                        }
+    
+                        if (g.buttons[15].pressed) {
+                            connectedTo.nextCharacter(1);
+                            this.controllerDebounce[g.index] = debounceTime;
+                        }
+                    } else {
+                        this.controllerDebounce[g.index]--;
+                    }
+
                 }
-
-            }
-        }
-
-        if (this.gamepadMgr.gamepads[1]) {
-            if (this.controllerDebounce <= 0) {
-                if (this.gamepadMgr.gamepads[1].buttons[2].pressed) { (<ControllerScreen>this.screenMgr.currentScreenElement)?.testButtonPressed(1); this.controllerDebounce = debounceTime; }
-            } else {
-                this.controllerDebounce--;
             }
         }
     }

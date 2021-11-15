@@ -1,26 +1,48 @@
+* {
+    margin: 0;
+}
+
 :host {
     background-color: grey;
 }
 
 #player-number {
-    position: absolute;
-    top: 0;
+    position: relative;
     width: 100%;
     text-align: center;
 }
 
 #controller-id {
-    position: absolute;
-    top: 10%;
+    position: relative;
     width: 100%;
     text-align: center;
 }
 
 #controller-image {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 25%;
-    text-align: center;
+    position: relative;
+    width: 30%;
+    max-width: 48px;
 }
+
+button {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    background: transparent;
+    background-image: url(/img/nav-next.png);
+    border-radius: 100%;
+    border: 1px solid white;
+    bottom: 20%;
+}
+
+#btn-char-prev {
+    background-image: url(/img/nav-prev.png);
+}
+
+#character-image {
+    position: relative;
+    width: 30%;
+    max-width: 64px;
+}
+
+#btn-char-next {}

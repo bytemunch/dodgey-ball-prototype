@@ -1,10 +1,10 @@
 #controller-setup {
-    grid-template-columns: 0.5fr 1fr 1fr 1fr 0.5fr;
+    grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr 0.5fr;
     grid-template-rows: 1fr 1fr 1fr;
 }
 
 #controller-setup .title {
-    grid-column: 3;
+    grid-column: 3/5;
     grid-row: 1;
 }
 
@@ -18,31 +18,28 @@
     position: relative;
 }
 
-#controller-setup .controller-button.gamepad {
-    background-image: url(../img/controller.png);
-}
-
-
-/* #controller-setup .controller-button.touch {
-    background-image: url(../img/touch.png);
-}
-
-#controller-setup .controller-button.kbm {
-    background-image: url(../img/kbm.png);
-} */
-
 #controller-setup #controller-1 {
     grid-column: 2;
     grid-row: 2;
 }
 
 #controller-setup #controller-2 {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+#controller-setup #controller-3 {
     grid-column: 4;
     grid-row: 2;
 }
 
+#controller-setup #controller-4 {
+    grid-column: 5;
+    grid-row: 2;
+}
+
 #controller-setup #done {
-    grid-column: 3;
+    grid-column: 3/5;
     grid-row: 3;
 }
 
