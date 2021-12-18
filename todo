@@ -1,7 +1,13 @@
 UX don't send click event on controller A press for ControlSelect elements
 UX ignore A press from controller 1 with regard to player setup when pressing Done or Back on controller setup screen
-UX A and D should let keyboard players change character
-UX left-right buttons needed for touch users to change character anyway, just use them for KB?
+
+GAME add team setup after match setup screen
+
+GAME online stuff
+
+GAME allow more than 2 players
+
+GAME allow different court sizes (vary depending on playercount?)
 
 BUG player flies up when not focused?
     pause on unfocus?

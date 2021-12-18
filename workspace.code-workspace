@@ -1,0 +1,21 @@
+{
+    "folders": [
+		{
+			"name": "frontend",
+			"path": "frontend"
+		},
+		{
+			"name": "backend",
+			"path": "backend"
+		},
+		{
+			"name": "dodgey-ball",
+			"path": "."
+		}
+	],
+	"settings": {
+		"deno.suggest.imports.hosts": {
+			"https://deno.land": true
+		}
+	}
+}

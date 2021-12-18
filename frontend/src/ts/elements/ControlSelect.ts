@@ -158,9 +158,19 @@ export class ControlSelect extends CustomElement {
             this.style.backgroundColor = color;
         }
 
+        const controllerNameManifest = {
+            "Xbox 360 Controller (XInput STANDARD GAMEPAD)": "Xbox Controller",
+            "Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 05c4)": "PS4 Controller",
+            "Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 09cc)": "PS4 Controller",
+            "054c-09cc-Wireless Controller": "PS4 Controller",
+            "054c-05c4-Wireless Controller": "PS4 Controller",
+            "PLAYSTATION(R)3 Controller (Vendor: 054c Product: 0268)": "PS3 Controller",
+            "PS3 GamePad (Vendor: 054c Product: 0268)": "PS3 Controller",
+            "Pro Controller (STANDARD GAMEPAD Vendor: 057e Product: 2009)":"Switch Pro Controller",
+        }
 
-
-        this.controllerIDp.textContent = this.selectedInputType == 'gamepad' ? game.gamepadMgr.gamepads[this.selectedInputId].id : this.selectedInputType;
+        // TODO analytics ping if unknown controller
+        this.controllerIDp.textContent = this.selectedInputType == 'gamepad' ? controllerNameManifest[game.gamepadMgr.gamepads[this.selectedInputId].id] || 'Unknown Controller' : this.selectedInputType;
         this.controllerImg.src = this.selectedInputImg;
         this.characterImg.src = `img/characters/char${this.selectedCharacter}-placeholder.png`;
     }
